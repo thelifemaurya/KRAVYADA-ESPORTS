@@ -1,1 +1,9 @@
-{"name":"kravyada-esports","version":"1.0.0","private":true,"scripts":{"dev":"next dev","build":"next build","start":"next start","lint":"next lint"},"dependencies":{"@prisma/client":"latest","next":"latest","react":"latest","react-dom":"latest","stripe":"latest"},"devDependencies":{"prisma":"latest","typescript":"latest","@types/node":"latest","@types/react":"latest","@types/react-dom":"latest"},"engines":{"node":">=20"}}
+{
+  "name": "kravyada-esports",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {"dev":"next dev","build":"prisma generate && next build","start":"next start","lint":"next lint","db:push":"prisma db push","db:generate":"prisma generate"},
+  "dependencies":{"@prisma/client":"latest","next":"latest","react":"latest","react-dom":"latest","stripe":"latest"},
+  "devDependencies":{"prisma":"latest","typescript":"latest","@types/node":"latest","@types/react":"latest","@types/react-dom":"latest"},
+  "engines":{"node":">=20"}
+}
