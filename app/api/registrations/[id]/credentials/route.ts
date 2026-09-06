@@ -8,7 +8,6 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     const { id } = await params
     const registration = await db.registration.findUnique({ where: { id }, include: { scrim: true } })
     if (!registration || registration.userId !== user.id) return NextResponse.json({ error: 'Registration not found.' }, { status: 404 })
-    if (registration.paymentStatus !== 'PAID') return NextResponse.json({ error: 'Match credentials unlock after successful payment.' }, { status: 403 })
     if (!registration.scrim.credentialsPublishedAt || !registration.scrim.roomId || !registration.scrim.roomPassword) return NextResponse.json({ error: 'Credentials have not been published yet.' }, { status: 404 })
     return NextResponse.json({ roomId: registration.scrim.roomId, roomPassword: registration.scrim.roomPassword })
   } catch (error) {
