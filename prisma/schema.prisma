@@ -1,82 +1,113 @@
-generator client { provider = "prisma-client-js" }
-datasource db { provider = "sqlite" url = env("DATABASE_URL") }
+generator client {
+  provider = "prisma-client-js"
+}
 
-enum Role { USER ADMIN HOST MODERATOR }
-enum ScrimStatus { DRAFT OPEN FULL CLOSED LIVE COMPLETED CANCELLED }
-enum PaymentStatus { PENDING PAID FAILED REFUNDED }
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+  HOST
+  MODERATOR
+}
+
+enum ScrimStatus {
+  DRAFT
+  OPEN
+  FULL
+  CLOSED
+  LIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
 
 model User {
-  id String @id @default(cuid())
-  name String
-  email String @unique
-  phone String
-  passwordHash String
-  role Role @default(USER)
-  ign String?
-  gameUid String?
-  createdAt DateTime @default(now())
+  id            String         @id @default(cuid())
+  name          String
+  email         String         @unique
+  phone         String
+  passwordHash  String
+  role          Role           @default(USER)
+  ign           String?
+  gameUid       String?
+  createdAt     DateTime       @default(now())
   registrations Registration[]
 }
+
 model Scrim {
-  id String @id @default(cuid())
-  title String
-  game String
-  category String
-  description String?
-  rules String?
-  bannerUrl String?
-  date DateTime
-  startTime DateTime
-  registrationDeadline DateTime
-  entryFee Int
-  prizePool Int
-  totalSlots Int
-  status ScrimStatus @default(DRAFT)
-  roomId String?
-  roomPassword String?
+  id                    String         @id @default(cuid())
+  title                 String
+  game                  String
+  category              String
+  description           String?
+  rules                 String?
+  bannerUrl             String?
+  date                  DateTime
+  startTime             DateTime
+  registrationDeadline  DateTime
+  entryFee              Int
+  prizePool             Int
+  totalSlots            Int
+  status                ScrimStatus    @default(DRAFT)
+  roomId                String?
+  roomPassword          String?
   credentialsPublishedAt DateTime?
-  createdAt DateTime @default(now())
-  registrations Registration[]
-  results Result[]
+  createdAt             DateTime       @default(now())
+  registrations         Registration[]
+  results               Result[]
 }
+
 model Registration {
-  id String @id @default(cuid())
-  code String @unique
-  userId String
-  scrimId String
-  slotNumber Int?
-  teamName String?
-  playerData String?
-  amount Int
-  paymentStatus PaymentStatus @default(PENDING)
-  paymentRef String?
-  stripeSessionId String?
-  createdAt DateTime @default(now())
-  user User @relation(fields:[userId],references:[id],onDelete:Cascade)
-  scrim Scrim @relation(fields:[scrimId],references:[id],onDelete:Cascade)
-  result Result?
-  @@unique([scrimId,slotNumber])
+  id               String        @id @default(cuid())
+  code             String        @unique
+  userId           String
+  scrimId          String
+  slotNumber       Int?
+  teamName         String?
+  playerData       String?
+  amount           Int
+  paymentStatus    PaymentStatus @default(PENDING)
+  paymentRef       String?
+  stripeSessionId  String?
+  createdAt        DateTime      @default(now())
+  user             User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scrim            Scrim         @relation(fields: [scrimId], references: [id], onDelete: Cascade)
+  result           Result?
+
+  @@unique([scrimId, slotNumber])
 }
+
 model Result {
-  id String @id @default(cuid())
-  scrimId String
-  registrationId String @unique
-  rank Int?
-  kills Int @default(0)
-  points Int @default(0)
-  prizeAmount Int @default(0)
-  notes String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  scrim Scrim @relation(fields:[scrimId],references:[id],onDelete:Cascade)
-  registration Registration @relation(fields:[registrationId],references:[id],onDelete:Cascade)
+  id             String       @id @default(cuid())
+  scrimId        String
+  registrationId String       @unique
+  rank           Int?
+  kills          Int           @default(0)
+  points         Int           @default(0)
+  prizeAmount    Int           @default(0)
+  notes          String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  scrim          Scrim        @relation(fields: [scrimId], references: [id], onDelete: Cascade)
+  registration   Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
 }
+
 model AuditLog {
-  id String @id @default(cuid())
-  actorId String
-  action String
-  entity String
-  entityId String?
-  metadata String?
+  id        String   @id @default(cuid())
+  actorId   String
+  action    String
+  entity    String
+  entityId  String?
+  metadata  String?
   createdAt DateTime @default(now())
 }
