@@ -1,0 +1,14 @@
+'use client'
+
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+
+type Scrim={id:string;title:string;game:string;category:string;startTime:string;prizePool:number;status:string}
+type Result={rank:number|null;kills:number;points:number;prizeAmount:number;teamName:string|null;player:string;slotNumber:number|null}
+export default function Results(){
+ const [scrims,setScrims]=useState<Scrim[]>([]); const [selected,setSelected]=useState(''); const [results,setResults]=useState<Result[]>([]); const [loading,setLoading]=useState(true); const [error,setError]=useState('')
+ useEffect(()=>{fetch('/api/scrims?status=COMPLETED').then(async r=>{const d=await r.json();setScrims(d.scrims||[]);if(d.scrims?.[0])setSelected(d.scrims[0].id);setLoading(false)}).catch(()=>{setError('Unable to load results.');setLoading(false)})},[])
+ useEffect(()=>{if(!selected){setResults([]);return}fetch(`/api/results?scrimId=${selected}`).then(async r=>{const d=await r.json();if(!r.ok)throw new Error(d.error);setResults(d.results||[])}).catch(()=>setError('Unable to load leaderboard.'))},[selected])
+ const current=scrims.find(s=>s.id===selected)
+ return <main><nav className="nav"><Link href="/" className="brand"><span>K</span> KRAVYADA <b>ESPORTS</b></Link><div className="navlinks"><Link href="/dashboard">My Matches</Link><Link href="/profile">Profile</Link><Link href="/">Home</Link></div></nav><section className="admin"><p className="eyebrow">COMPETITIVE RECORD</p><h1>Results & Leaderboards</h1><p className="muted">Official KRAVYADA results published by staff after each completed match.</p>{loading?<p className="muted">Loading results...</p>:scrims.length===0?<div className="adminpanel"><h2>No completed scrims yet.</h2><p className="muted">Published results will appear here after matches are completed.</p><Link className="btn primary" href="/">BROWSE SCRIMS →</Link></div>:<><div className="filters" style={{marginTop:30}}>{scrims.map(s=><button key={s.id} className={selected===s.id?'selected':''} onClick={()=>{setSelected(s.id);setError('')}}>{s.title}</button>)}</div>{current&&<div className="adminpanel"><p className="eyebrow">{current.game} • {current.category}</p><h2>{current.title}</h2><p className="muted">{new Date(current.startTime).toLocaleString()} • Prize Pool ₹{current.prizePool}</p></div>}{error&&<p className="error">{error}</p>}<div className="table"><div className="tr th"><span>RANK / PLAYER</span><span>TEAM</span><span>KILLS</span><span>POINTS</span><span>PRIZE</span></div>{results.length===0?<div className="adminpanel"><p className="muted">Results are not published for this match yet.</p></div>:results.map((r,i)=><div className="tr" key={`${r.player}-${r.slotNumber}-${i}`}><span><b>#{r.rank??i+1}</b><small>{r.player} • Slot {r.slotNumber??'—'}</small></span><span>{r.teamName||'SOLO'}</span><span>{r.kills}</span><span><b>{r.points}</b></span><span>₹{r.prizeAmount}</span></div>)}</div></>}</section></main>
+}
