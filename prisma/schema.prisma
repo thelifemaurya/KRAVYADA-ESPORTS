@@ -17,7 +17,6 @@ model User {
   createdAt DateTime @default(now())
   registrations Registration[]
 }
-
 model Scrim {
   id String @id @default(cuid())
   title String
@@ -38,8 +37,8 @@ model Scrim {
   credentialsPublishedAt DateTime?
   createdAt DateTime @default(now())
   registrations Registration[]
+  results Result[]
 }
-
 model Registration {
   id String @id @default(cuid())
   code String @unique
@@ -55,9 +54,23 @@ model Registration {
   createdAt DateTime @default(now())
   user User @relation(fields:[userId],references:[id],onDelete:Cascade)
   scrim Scrim @relation(fields:[scrimId],references:[id],onDelete:Cascade)
+  result Result?
   @@unique([scrimId,slotNumber])
 }
-
+model Result {
+  id String @id @default(cuid())
+  scrimId String
+  registrationId String @unique
+  rank Int?
+  kills Int @default(0)
+  points Int @default(0)
+  prizeAmount Int @default(0)
+  notes String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  scrim Scrim @relation(fields:[scrimId],references:[id],onDelete:Cascade)
+  registration Registration @relation(fields:[registrationId],references:[id],onDelete:Cascade)
+}
 model AuditLog {
   id String @id @default(cuid())
   actorId String
