@@ -12,7 +12,7 @@ export default function Home() {
   return (
     <main>
       <nav className="nav">
-        <a className="brand" href="#top"><img src="/logo.png" alt="KRAVYADA" /><span>KRAVYADA</span></a>
+        <a className="brand" href="#top"><img src="/kravyada-logo.png" alt="KRAVYADA" /><span>KRAVYADA</span></a>
         <div className="links"><a href="#about">About</a><a href="#events">Events</a><a href="#community">Community</a><a className="navButton" href={LINKS.discord} {...external}>JOIN KRAVYADA</a></div>
       </nav>
 
@@ -38,7 +38,7 @@ export default function Home() {
 
       <section id="join" className="join"><div className="joinInner"><p className="eyebrow">04 — YOUR MOVE</p><h2>READY TO<br /><em>RISE?</em></h2><p>Whether you're a player, creator or someone who simply loves the game — there's a place for you here.</p><div className="joinActions"><a className="primary" href={LINKS.discord} {...external}>JOIN OUR DISCORD ↗</a><a className="darkButton" href={LINKS.paidScrims} {...external}>PAID TOURNAMENTS ↗</a><a className="darkButton" href={LINKS.whatsapp} {...external}>WHATSAPP COMMUNITY ↗</a></div></div></section>
 
-      <footer><div className="footerBrand"><img src="/logo.png" alt="" /><strong>KRAVYADA</strong><span>ESPORTS</span></div><div className="footerLinks"><a href="#about">ABOUT</a><a href="#events">EVENTS</a><a href={LINKS.discord} {...external}>DISCORD</a><a href={LINKS.youtube} {...external}>YOUTUBE</a><a href={LINKS.instagram} {...external}>INSTAGRAM</a><a href={LINKS.paidScrims} {...external}>PAID SCRIMS</a><a href={LINKS.whatsapp} {...external}>WHATSAPP</a></div><p>© 2026 KRAVYADA ESPORTS. ALL RIGHTS RESERVED.</p></footer>
+      <footer><div className="footerBrand"><img src="/kravyada-logo.png" alt="" /><strong>KRAVYADA</strong><span>ESPORTS</span></div><div className="footerLinks"><a href="#about">ABOUT</a><a href="#events">EVENTS</a><a href={LINKS.discord} {...external}>DISCORD</a><a href={LINKS.youtube} {...external}>YOUTUBE</a><a href={LINKS.instagram} {...external}>INSTAGRAM</a><a href={LINKS.paidScrims} {...external}>PAID SCRIMS</a><a href={LINKS.whatsapp} {...external}>WHATSAPP</a></div><p>© 2026 KRAVYADA ESPORTS. ALL RIGHTS RESERVED.</p></footer>
     </main>
   )
 }
