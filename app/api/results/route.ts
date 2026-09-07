@@ -1,9 +1,0 @@
-import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-
-export async function GET(req:Request){
-  const scrimId=new URL(req.url).searchParams.get('scrimId')
-  if(!scrimId)return NextResponse.json({error:'scrimId required.'},{status:400})
-  const results=await db.result.findMany({where:{scrimId},include:{registration:{select:{id:true,slotNumber:true,teamName:true,user:{select:{name:true,ign:true}}}}},orderBy:[{rank:'asc'},{points:'desc'},{kills:'desc'}]})
-  return NextResponse.json({results:results.map(r=>({registrationId:r.registration.id,rank:r.rank,kills:r.kills,points:r.points,prizeAmount:r.prizeAmount,teamName:r.registration.teamName,player:r.registration.user.ign||r.registration.user.name,slotNumber:r.registration.slotNumber}))})
-}
