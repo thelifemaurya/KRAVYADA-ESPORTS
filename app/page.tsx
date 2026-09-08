@@ -1,131 +1,24 @@
 'use client'
 
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useState } from 'react'
 
-const LINKS = {
-  discord: 'https://discord.gg/sNdGHm9hEa',
-  youtube: 'https://youtube.com/@kravyadaesports?si=0J9RophFfs9_hM1l',
-  instagram: 'https://www.instagram.com/kravyadaesports',
-  paidScrims: 'https://www.instagram.com/kravyadapaidscrims',
-  whatsapp: 'https://whatsapp.com/channel/0029VbDsg3BAjPXJnFUMKA0M',
-}
-const LOGO = 'https://raw.githubusercontent.com/thelifemaurya/KRAVYADA-ESPORTS/main/kravyada-logo.png'
-const external = { target: '_blank', rel: 'noopener noreferrer' as const }
+const LOGO='https://raw.githubusercontent.com/thelifemaurya/KRAVYADA-ESPORTS/main/kravyada-logo.png'
+const LINKS={discord:'https://discord.gg/sNdGHm9hEa',youtube:'https://youtube.com/@kravyadaesports?si=0J9RophFfs9_hM1l',instagram:'https://www.instagram.com/kravyadaesports',paid:'https://www.instagram.com/kravyadapaidscrims',whatsapp:'https://whatsapp.com/channel/0029VbDsg3BAjPXJnFUMKA0M'}
+const ext={target:'_blank',rel:'noopener noreferrer'}
 
-type RevealProps = { children: ReactNode; className?: string; delay?: number }
-function Reveal({ children, className = '', delay = 0 }: RevealProps) {
-  const ref = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    const node = ref.current
-    if (!node) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { node.classList.add('is-visible'); return }
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) { node.classList.add('is-visible'); observer.unobserve(node) }
-    }, { threshold: 0.12, rootMargin: '0px 0px -7% 0px' })
-    observer.observe(node)
-    return () => observer.disconnect()
-  }, [])
-  return <div ref={ref} className={`kr-reveal ${className}`} style={{ '--kr-reveal-delay': `${delay}ms` } as CSSProperties}>{children}</div>
-}
+function Reveal({children,delay=0}:{children:React.ReactNode,delay?:number}){const [show,setShow]=useState(false);useEffect(()=>{const el=document.getElementById('r'+Math.random());return()=>{void el}},[]);return <div className="rv" style={{'--d':`${delay}ms`} as React.CSSProperties}>{children}</div>}
 
-function Intro() {
-  const [leaving, setLeaving] = useState(false)
-  const [done, setDone] = useState(false)
-  useEffect(() => {
-    const a = window.setTimeout(() => setLeaving(true), 1250)
-    const b = window.setTimeout(() => setDone(true), 1950)
-    return () => { clearTimeout(a); clearTimeout(b) }
-  }, [])
-  if (done) return null
-  return <div className={`kr-intro${leaving ? ' kr-intro--leaving' : ''}`} aria-hidden="true"><img className="kr-intro__logo" src={LOGO} alt="" width={110} height={110} /></div>
-}
+function Intro(){const [hide,setHide]=useState(false);useEffect(()=>{const t=setTimeout(()=>setHide(true),2400);return()=>clearTimeout(t)},[]);if(hide)return null;return <div className="intro"><div className="intro-orbit o1"/><div className="intro-orbit o2"/><div className="intro-mark"><img src={LOGO} alt=""/></div><div className="intro-name">KRAVYADA <span>ESPORTS</span></div><div className="intro-line"><i/></div><div className="intro-load">INITIALIZING // KRAVYADA</div></div>}
 
-function ScrollingNavbar() {
-  const [scrolled, setScrolled] = useState(false)
-  useEffect(() => {
-    const update = () => setScrolled(window.scrollY > 24)
-    update(); window.addEventListener('scroll', update, { passive: true })
-    return () => window.removeEventListener('scroll', update)
-  }, [])
-  return <nav className={`nav kr-navbar kr-navbar--enter${scrolled ? ' kr-navbar--scrolled' : ''}`} aria-label="Main navigation">
-    <a className="brand kr-nav-link" href="#top"><span className="brandMark"><img src={LOGO} alt="KRAVYADA logo" /></span><span>KRAVYADA <small>ESPORTS</small></span></a>
-    <div className="links"><a className="kr-nav-link" href="#about">About</a><a className="kr-nav-link" href="#events">Arena</a><a className="kr-nav-link" href="#community">Community</a><a className="navButton kr-button" href={LINKS.discord} {...external}>Join Us <span className="kr-button__arrow">↗</span></a></div>
-  </nav>
-}
-
-function MouseParallax({ children }: { children: ReactNode }) {
-  const ref = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    const node = ref.current
-    if (!node || window.matchMedia('(hover: none), (pointer: coarse)').matches || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    let frame = 0
-    const move = (e: PointerEvent) => {
-      const r = node.getBoundingClientRect(); const x = ((e.clientX-r.left)/r.width-.5)*2; const y = ((e.clientY-r.top)/r.height-.5)*2
-      if (!frame) frame = requestAnimationFrame(() => { node.style.setProperty('--kr-mouse-x', String(x)); node.style.setProperty('--kr-mouse-y', String(y)); frame=0 })
-    }
-    const reset = () => { node.style.setProperty('--kr-mouse-x','0'); node.style.setProperty('--kr-mouse-y','0') }
-    node.addEventListener('pointermove', move); node.addEventListener('pointerleave', reset)
-    return () => { node.removeEventListener('pointermove', move); node.removeEventListener('pointerleave', reset); if(frame) cancelAnimationFrame(frame) }
-  }, [])
-  return <div ref={ref} className="kr-parallax" style={{ '--kr-parallax-strength':'10px' } as CSSProperties}>{children}</div>
-}
-
-function PremiumButton({ href, children, className = '' }: { href: string; children: ReactNode; className?: string }) {
-  return <a href={href} {...external} className={`kr-button ${className}`}><span>{children}</span><span className="kr-button__arrow">→</span></a>
-}
-
-function Card({ children }: { children: ReactNode }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const move = (e: React.PointerEvent<HTMLDivElement>) => { const n=ref.current; if(!n)return; const r=n.getBoundingClientRect(); n.style.setProperty('--kr-card-x',`${((e.clientX-r.left)/r.width)*100}%`); n.style.setProperty('--kr-card-y',`${((e.clientY-r.top)/r.height)*100}%`) }
-  return <div ref={ref} className="card kr-card" onPointerMove={move}>{children}</div>
-}
-
-const marquee = ['COMPETE','CONQUER','CREATE','EVOLVE','KRAVYADA']
-function Marquee() { return <div className="ticker kr-marquee" aria-label="KRAVYADA values"><div className="kr-marquee__track"><div className="kr-marquee__group">{marquee.map(x=><span className="kr-marquee__item" key={`a-${x}`}><span>{x}</span><b>✦</b></span>)}</div><div className="kr-marquee__group">{marquee.map(x=><span className="kr-marquee__item" key={`b-${x}`}><span>{x}</span><b>✦</b></span>)}</div></div></div> }
-
-export default function Home() {
-  return <main id="top">
-    <Intro />
-    <div className="ambient ambientOne" aria-hidden="true" /><div className="ambient ambientTwo" aria-hidden="true" /><div className="noise" aria-hidden="true" />
-    <ScrollingNavbar />
-
-    <section className="hero kr-hero-atmosphere" aria-labelledby="hero-title">
-      <div className="heroGrid" aria-hidden="true" /><div className="heroGlow" aria-hidden="true" />
-      <MouseParallax><div className="heroContent">
-        <div className="heroBadge"><span /> Independent Esports Organization <b>·</b> Est. 2026</div>
-        <p className="eyebrow kr-hero-copy">NO SHORTCUTS. JUST THE GRIND.</p>
-        <h1 id="hero-title" className="kr-hero-title"><span className="kr-hero-title__line" style={{ '--kr-line-index':0 } as CSSProperties}><span>BUILT TO</span></span><span className="kr-hero-title__line" style={{ '--kr-line-index':1 } as CSSProperties}><span>CONQUER.</span></span></h1>
-        <p className="heroText kr-hero-copy">Competitive gaming, real opportunities and a community built for people who refuse to play small.</p>
-        <div className="actions"><PremiumButton href={LINKS.discord} className="primary">JOIN KRAVYADA ↗</PremiumButton><a className="secondary kr-button" href="#about">EXPLORE <span className="kr-button__arrow">↓</span></a></div>
-      </div></MouseParallax>
-      <div className="heroMeta"><span>01 / 04</span><span>SCROLL TO EXPLORE ↓</span><span>MUMBAI · INDIA</span></div>
-    </section>
-
-    <Marquee />
-
-    <Reveal><section id="about" className="section split">
-      <div><p className="eyebrow">01 — WHO WE ARE</p><h2 className="kr-display-reveal"><span>MORE THAN<br /><em>A TEAM.</em></span></h2></div>
-      <div className="copy"><p className="lead">KRAVYADA is an independent esports organization focused on competitive gaming, tournaments and a strong player-first community.</p><p>We create spaces where players can compete, practice, improve and make their mark. From scrims to community events, every part of the grind matters.</p><div className="miniStats"><div><strong>01</strong><span>PLAYER<br />FIRST</span></div><div><strong>24/7</strong><span>COMMUNITY<br />ENERGY</span></div><div><strong>∞</strong><span>ROOM TO<br />RISE</span></div></div><a className="textLink kr-arrow-link" href={LINKS.discord} {...external}>ENTER THE COMMUNITY <span className="kr-arrow-link__icon">↗</span></a></div>
-    </section></Reveal>
-
-    <Reveal><section id="events" className="section dark">
-      <div className="sectionHead"><div><p className="eyebrow">02 — WHAT WE DO</p><h2>THE <em>ARENA.</em></h2></div><span className="counter">03 / 03 — BUILT FOR THE GRIND</span></div>
-      <div className="cards kr-card-grid">
-        <Card><div className="cardTop"><small>01</small><span>01</span></div><div className="cardIcon">⌁</div><h3>COMPETITIVE<br />TEAMS</h3><p>Build a roster, sharpen your game sense and compete with players who take the game seriously.</p><a className="cardLink kr-arrow-link" href={LINKS.discord} {...external}>TALK TO US <span className="kr-arrow-link__icon">↗</span></a></Card>
-        <Card><div className="cardTop"><small>02</small><span>02</span></div><div className="cardIcon">◈</div><h3>DAILY<br />SCRIMS</h3><p>Regular practice, leagues and paid lobbies designed to keep competitors active and improving.</p><a className="cardLink kr-arrow-link" href={LINKS.paidScrims} {...external}>PAID SCRIMS <span className="kr-arrow-link__icon">↗</span></a></Card>
-        <Card><div className="cardTop"><small>03</small><span>03</span></div><div className="cardIcon">✦</div><h3>COMMUNITY<br />EVENTS</h3><p>Tournaments, watch parties and community experiences that bring gamers together.</p><a className="cardLink kr-arrow-link" href={LINKS.whatsapp} {...external}>WHATSAPP COMMUNITY <span className="kr-arrow-link__icon">↗</span></a></Card>
-      </div>
-    </section></Reveal>
-
-    <Reveal><section id="mindset" className="mindset"><div className="mindsetLine" /><p className="eyebrow">03 — THE MINDSET</p><blockquote className="kr-display-reveal"><span>THE NAME IS NOT<br />GIVEN. <em>IT IS EARNED.</em></span></blockquote><p className="quoteSub">Every match. Every loss. Every comeback. That's how you become KRAVYADA.</p><div className="quoteRule"><span /> KRAVYADA STANDARD <span /></div></section></Reveal>
-
-    <Reveal><section id="community" className="community">
-      <div className="communityIntro"><p className="eyebrow">COMMUNITY // 04</p><h2>STAY<br /><em>CONNECTED.</em></h2><p>Follow the organization, find the next scrim and stay close to everything KRAVYADA.</p></div>
-      <div className="socialGrid">{[[LINKS.discord,'DISCORD'],[LINKS.youtube,'YOUTUBE'],[LINKS.instagram,'INSTAGRAM'],[LINKS.paidScrims,'PAID SCRIMS'],[LINKS.whatsapp,'WHATSAPP']].map(([href,label],i)=><a className="kr-arrow-link" key={label} href={href} {...external}><span>{String(i+1).padStart(2,'0')}</span><strong>{label}</strong><b className="kr-arrow-link__icon">↗</b></a>)}</div>
-    </section></Reveal>
-
-    <Reveal><section id="join" className="join kr-final-cta"><div className="joinInner"><div><p className="eyebrow">FINAL CALL // YOUR MOVE</p><h2>READY TO<br /><em>RISE?</em></h2></div><div className="joinCopy"><p>Whether you're a player, creator or someone who simply loves the game — there is a place for you here.</p><div className="joinActions"><PremiumButton href={LINKS.discord} className="joinDark">JOIN OUR DISCORD</PremiumButton><PremiumButton href={LINKS.paidScrims} className="joinOutline">PAID TOURNAMENTS</PremiumButton></div></div></div></section></Reveal>
-
-    <footer><div className="footerTop"><a className="footerBrand" href="#top"><span className="footerLogo"><img src={LOGO} alt="" /></span><strong>KRAVYADA</strong><small>ESPORTS</small></a><p>BUILT FOR COMPETITORS.<br />POWERED BY COMMUNITY.</p></div><div className="footerBottom"><div className="footerLinks"><a href="#about">ABOUT</a><a href="#events">ARENA</a><a href="#mindset">MINDSET</a><a href={LINKS.discord} {...external}>DISCORD</a><a href={LINKS.instagram} {...external}>INSTAGRAM</a><a href={LINKS.youtube} {...external}>YOUTUBE</a></div><p>© {new Date().getFullYear()} KRAVYADA ESPORTS. ALL RIGHTS RESERVED.</p></div></footer>
-  </main>
-}
+export default function Home(){return <main><Intro/><style jsx global>{`@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap');
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#050505;color:#f2f0eb;font-family:Inter,Arial,sans-serif}a{text-decoration:none;color:inherit}main{overflow:hidden;background:#050505;--acid:#d9ff00;--line:#242424}.noise{position:fixed;inset:0;z-index:50;pointer-events:none;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.intro{position:fixed;inset:0;z-index:99999;background:#050505;display:flex;flex-direction:column;align-items:center;justify-content:center;animation:introOut .8s 1.9s cubic-bezier(.76,0,.24,1) forwards}.intro-orbit{position:absolute;border:1px solid #ffffff18;border-radius:50%;animation:orbitIn 1.6s cubic-bezier(.22,1,.36,1) forwards}.o1{width:38vmin;height:38vmin}.o2{width:64vmin;height:64vmin;border-color:#d9ff0014}.intro-mark{width:150px;height:150px;display:grid;place-items:center;position:relative;z-index:2;animation:markIn 1.3s cubic-bezier(.22,1,.36,1) both}.intro-mark:before{content:'';position:absolute;inset:-14px;border:1px solid #d9ff0030;transform:rotate(45deg);animation:squareIn 1.2s .2s both}.intro-mark img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 35px #d9ff0045)}.intro-name{position:absolute;top:calc(50% + 108px);font:900 18px 'Barlow Condensed';letter-spacing:.3em;animation:fadeUp .8s .65s both}.intro-name span{display:block;font:800 7px Inter;letter-spacing:.55em;text-align:center;color:#777;margin-top:5px}.intro-line{position:absolute;bottom:13%;width:150px;height:1px;background:#252525;overflow:hidden}.intro-line i{display:block;height:100%;background:var(--acid);animation:load 1.8s .2s cubic-bezier(.22,1,.36,1) both}.intro-load{position:absolute;bottom:10%;font-size:7px;letter-spacing:.35em;color:#555;animation:fadeUp .7s 1s both}
+.nav{height:78px;position:absolute;z-index:20;top:0;left:0;right:0;padding:0 6vw;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff0c;background:linear-gradient(#050505e8,transparent)}.brand{display:flex;align-items:center;gap:11px;font-size:13px;font-weight:800;letter-spacing:.16em}.brand img{width:38px;height:38px;object-fit:contain}.brand small{display:block;font-size:6px;letter-spacing:.4em;color:#777;margin-top:3px}.navlinks{display:flex;gap:30px;align-items:center;font-size:9px;text-transform:uppercase;letter-spacing:.18em;color:#999}.navlinks a:not(.navcta):hover{color:var(--acid)}.navcta{padding:12px 18px;background:var(--acid);color:#050505;font-weight:900}
+.hero{min-height:100svh;position:relative;display:flex;align-items:center;padding:130px 8vw 80px;border-bottom:1px solid var(--line);background:radial-gradient(circle at 78% 35%,#d9ff0014,transparent 30%),#050505}.grid{position:absolute;inset:0;opacity:.22;background-image:linear-gradient(#fff1 1px,transparent 1px),linear-gradient(90deg,#fff1 1px,transparent 1px);background-size:70px 70px;mask-image:linear-gradient(#000,transparent 90%)}.hero:after{content:'K';position:absolute;right:-3vw;bottom:-16vw;font:900 55vw/.7 'Barlow Condensed';color:#fff006;pointer-events:none}.hero-inner{position:relative;z-index:2;max-width:1150px}.eyebrow{font-size:9px;letter-spacing:.28em;color:var(--acid);font-weight:800}.hero h1{font:900 clamp(86px,15vw,210px)/.76 'Barlow Condensed';letter-spacing:-.055em;margin:22px 0 28px;text-transform:uppercase}.hero h1 span{display:block;color:var(--acid);overflow:hidden}.hero h1 span:first-child{color:#f2f0eb}.hero h1 span{animation:headline 1s .15s cubic-bezier(.22,1,.36,1) both}.hero h1 span+span{animation-delay:.28s}.hero-copy{max-width:500px;color:#888;line-height:1.8;font-size:13px;animation:fadeUp .9s .65s both}.hero-actions{display:flex;gap:12px;margin-top:30px;animation:fadeUp .9s .8s both}.btn{padding:14px 21px;font-size:9px;font-weight:900;letter-spacing:.14em;border:1px solid #444;transition:.3s}.btn.primary{background:var(--acid);border-color:var(--acid);color:#050505}.btn:hover{transform:translateY(-3px);border-color:var(--acid)}.hero-bottom{position:absolute;bottom:28px;left:8vw;right:8vw;display:flex;justify-content:space-between;color:#555;font-size:7px;letter-spacing:.25em;z-index:2}
+.ticker{height:68px;display:flex;align-items:center;overflow:hidden;border-bottom:1px solid var(--line);white-space:nowrap}.ticker-track{display:flex;width:max-content;animation:marquee 22s linear infinite}.ticker span{font:800 22px 'Barlow Condensed';letter-spacing:.18em;margin:0 25px}.ticker b{color:var(--acid)}
+.section{padding:135px 8vw}.split{display:grid;grid-template-columns:1fr 1fr;gap:9vw}.section h2{font:900 clamp(75px,10vw,145px)/.78 'Barlow Condensed';letter-spacing:-.05em;margin:18px 0}.section h2 em{color:var(--acid);font-style:normal}.copy{padding-top:45px;max-width:560px}.copy .lead{font-size:20px;color:#d3d0c9;line-height:1.55}.copy p:not(.lead){font-size:13px;color:#777;line-height:1.85}.stats{display:flex;border-block:1px solid var(--line);margin:38px 0 25px}.stats div{flex:1;padding:18px 10px;border-right:1px solid var(--line)}.stats div:last-child{border:0}.stats strong{display:block;font:900 29px 'Barlow Condensed';color:var(--acid)}.stats span{font-size:7px;letter-spacing:.16em;color:#555}.arrow{color:var(--acid);font-size:9px;font-weight:900;letter-spacing:.15em}
+.dark{background:#0d0d0d;border-block:1px solid #ffffff0b}.head{display:flex;justify-content:space-between;align-items:end;margin-bottom:55px}.head h2{margin:15px 0 0}.cards{display:grid;grid-template-columns:repeat(3,1fr)}.card{min-height:380px;padding:30px;border-top:1px solid var(--line);border-right:1px solid var(--line);position:relative;overflow:hidden;transition:.4s}.card:last-child{border-right:0}.card:after{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--acid);transform:scaleX(0);transform-origin:left;transition:.5s}.card:hover{background:#ffffff05;transform:translateY(-7px)}.card:hover:after{transform:scaleX(1)}.num{color:var(--acid);font-size:9px;font-weight:800}.icon{font-size:28px;color:#444;margin-top:50px}.card h3{font:900 51px/.85 'Barlow Condensed';margin:14px 0}.card p{font-size:12px;color:#666;line-height:1.7;max-width:320px}.card .arrow{position:absolute;bottom:28px}
+.mindset{padding:165px 8vw;text-align:center;border-bottom:1px solid var(--line);background:radial-gradient(circle,#ffffff03,transparent 45%)}.mindset:before{content:'03';display:block;color:#333;font:900 12px Inter;letter-spacing:.3em;margin-bottom:35px}.mindset blockquote{font:900 clamp(64px,10vw,150px)/.78 'Barlow Condensed';letter-spacing:-.05em;margin:0}.mindset em{color:var(--acid);font-style:normal}.sub{color:#666;font-size:12px;margin-top:35px}.community{padding:140px 8vw;display:grid;grid-template-columns:.8fr 1.2fr;gap:9vw}.social{border-top:1px solid var(--line)}.social a{min-height:74px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:50px 1fr 25px;align-items:center;font-size:11px;letter-spacing:.16em;transition:.3s}.social a span{font-size:8px;color:#444}.social a b{color:#555}.social a:hover{padding-left:12px;color:var(--acid);background:#ffffff03}.social a:hover b{color:var(--acid)}
+.cta{background:var(--acid);color:#050505;padding:120px 8vw}.cta-inner{display:grid;grid-template-columns:1.1fr .9fr;gap:7vw;align-items:end}.cta h2{font:900 clamp(90px,14vw,190px)/.72 'Barlow Condensed';margin:15px 0 0}.cta p{line-height:1.8;font-size:13px;max-width:480px}.cta .btn{border-color:#050505;color:#050505}.cta .btn.primary{background:#050505;color:var(--acid)}footer{padding:50px 6vw 25px;background:#030303}footer .top{display:flex;justify-content:space-between;padding-bottom:40px;border-bottom:1px solid var(--line)}footer strong{font-size:18px;letter-spacing:.15em}footer small{display:block;color:#555;font-size:7px;letter-spacing:.35em}footer p{font-size:7px;color:#444;letter-spacing:.18em;line-height:1.7;text-align:right}.bottom{display:flex;justify-content:space-between;padding-top:22px;color:#444;font-size:7px;letter-spacing:.15em}.flinks{display:flex;gap:22px}.flinks a:hover{color:var(--acid)}
+.rv{animation:fadeUp .9s var(--d,0ms) cubic-bezier(.22,1,.36,1) both}@keyframes introOut{to{opacity:0;visibility:hidden;clip-path:circle(0 at 50% 50%)}}@keyframes orbitIn{from{opacity:0;transform:scale(.3) rotate(-20deg)}to{opacity:1;transform:none}}@keyframes markIn{from{opacity:0;transform:scale(.45);filter:blur(10px)}55%{opacity:1;transform:scale(1.08);filter:blur(0)}to{transform:scale(1)}}@keyframes squareIn{from{opacity:0;transform:rotate(0) scale(.3)}to{opacity:1;transform:rotate(45deg) scale(1)}}@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}@keyframes load{from{width:0}to{width:100%}}@keyframes headline{from{transform:translateY(115%);opacity:0}to{transform:none;opacity:1}}@keyframes marquee{to{transform:translateX(-50%)}}@media(max-width:700px){.nav{height:68px;padding:0 6vw}.brand{font-size:11px}.brand img{width:30px;height:30px}.navlinks a:not(.navcta){display:none}.hero{padding:120px 7vw 90px}.hero h1{font-size:22vw}.hero-copy{font-size:12px}.hero-actions{flex-direction:column}.hero-actions .btn{text-align:center}.hero-bottom span:last-child{display:none}.ticker{height:58px}.ticker span{font-size:18px;margin:0 16px}.section,.community,.cta{padding:90px 7vw}.split,.cards,.community,.cta-inner{grid-template-columns:1fr}.copy{padding-top:5px}.head{display:block}.counter{display:block;margin-top:15px}.card{min-height:310px;border-right:0}.mindset{padding:110px 7vw}.mindset blockquote{font-size:15vw}.social{margin-top:10px}.intro-mark{width:120px;height:120px}.intro-name{top:calc(50% + 92px)}footer .top,.bottom{display:block}footer p{text-align:left;margin-top:25px}.flinks{flex-wrap:wrap;gap:12px 18px}}@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}.intro{display:none}.rv{animation:none}}
+`}</style><div className="noise"/><nav className="nav"><a className="brand" href="#top"><img src={LOGO} alt="KRAVYADA"/><span>KRAVYADA<small>ESPORTS</small></span></a><div className="navlinks"><a href="#about">About</a><a href="#arena">Arena</a><a href="#community">Community</a><a className="navcta" href={LINKS.discord} {...ext}>JOIN US ↗</a></div></nav><section className="hero" id="top"><div className="grid"/><div className="hero-inner"><div className="eyebrow">INDEPENDENT ESPORTS ORGANIZATION</div><h1><span>BUILT TO</span><span>CONQUER.</span></h1><p className="hero-copy">Competitive gaming, serious practice and a community built for players who refuse to stay average.</p><div className="hero-actions"><a className="btn primary" href={LINKS.discord} {...ext}>JOIN KRAVYADA ↗</a><a className="btn" href="#about">EXPLORE ↓</a></div></div><div className="hero-bottom"><span>01 / 04</span><span>SCROLL TO EXPLORE ↓</span><span>KRAVYADA STANDARD</span></div></section><div className="ticker"><div className="ticker-track"><span>COMPETE <b>✦</b></span><span>CONQUER <b>✦</b></span><span>CREATE <b>✦</b></span><span>EVOLVE <b>✦</b></span><span>KRAVYADA <b>✦</b></span><span>COMPETE <b>✦</b></span><span>CONQUER <b>✦</b></span><span>CREATE <b>✦</b></span><span>EVOLVE <b>✦</b></span><span>KRAVYADA <b>✦</b></span></div></div><section id="about" className="section"><div className="split"><div><div className="eyebrow">01 — WHO WE ARE</div><h2>MORE THAN<br/><em>A TEAM.</em></h2></div><div className="copy"><p className="lead">KRAVYADA is built around competitive gaming, tournaments and a player-first community.</p><p>We create places to practice, compete, improve and connect. The goal is simple: give serious players room to rise.</p><div className="stats"><div><strong>01</strong><span>PLAYER FIRST</span></div><div><strong>∞</strong><span>ROOM TO RISE</span></div><div><strong>24/7</strong><span>COMMUNITY</span></div></div><a className="arrow" href={LINKS.discord} {...ext}>ENTER THE COMMUNITY ↗</a></div></div></section><section id="arena" className="section dark"><div className="head"><div><div className="eyebrow">02 — WHAT WE DO</div><h2>THE <em>ARENA.</em></h2></div><span className="counter">03 SYSTEMS / 01 STANDARD</span></div><div className="cards"><article className="card"><span className="num">01</span><div className="icon">⌁</div><h3>COMPETITIVE<br/>TEAMS</h3><p>Build a roster, sharpen your game sense and compete with players who take the game seriously.</p><a className="arrow" href={LINKS.discord} {...ext}>TALK TO US ↗</a></article><article className="card"><span className="num">02</span><div className="icon">◈</div><h3>DAILY<br/>SCRIMS</h3><p>Regular scrims, leagues and paid lobbies designed to keep competitors active and improving.</p><a className="arrow" href={LINKS.paid} {...ext}>PAID SCRIMS ↗</a></article><article className="card"><span className="num">03</span><div className="icon">✦</div><h3>COMMUNITY<br/>EVENTS</h3><p>Tournaments and community experiences that bring gamers together beyond the match.</p><a className="arrow" href={LINKS.whatsapp} {...ext}>JOIN COMMUNITY ↗</a></article></div></section><section className="mindset"><blockquote>THE NAME IS NOT<br/>GIVEN. <em>IT IS EARNED.</em></blockquote><p className="sub">Every match. Every loss. Every comeback.</p></section><section id="community" className="community"><div><div className="eyebrow">04 — COMMUNITY</div><h2>STAY<br/><em>CONNECTED.</em></h2><p className="sub">Find the next scrim, follow the org and stay close to everything KRAVYADA.</p></div><div className="social"><a href={LINKS.discord} {...ext}><span>01</span><strong>DISCORD</strong><b>↗</b></a><a href={LINKS.youtube} {...ext}><span>02</span><strong>YOUTUBE</strong><b>↗</b></a><a href={LINKS.instagram} {...ext}><span>03</span><strong>INSTAGRAM</strong><b>↗</b></a><a href={LINKS.paid} {...ext}><span>04</span><strong>PAID SCRIMS</strong><b>↗</b></a><a href={LINKS.whatsapp} {...ext}><span>05</span><strong>WHATSAPP</strong><b>↗</b></a></div></section><section className="cta"><div className="cta-inner"><div><div className="eyebrow">FINAL CALL // YOUR MOVE</div><h2>READY TO<br/>RISE?</h2></div><div><p>Whether you are a player, creator or simply someone who loves the game — there is a place for you here.</p><div className="hero-actions"><a className="btn primary" href={LINKS.discord} {...ext}>JOIN OUR DISCORD ↗</a><a className="btn" href={LINKS.paid} {...ext}>PAID TOURNAMENTS ↗</a></div></div></div></section><footer><div className="top"><div><strong>KRAVYADA</strong><small>ESPORTS</small></div><p>BUILT FOR COMPETITORS.<br/>POWERED BY COMMUNITY.</p></div><div className="bottom"><div className="flinks"><a href="#about">ABOUT</a><a href="#arena">ARENA</a><a href="#community">COMMUNITY</a><a href={LINKS.discord} {...ext}>DISCORD</a><a href={LINKS.instagram} {...ext}>INSTAGRAM</a></div><span>© {new Date().getFullYear()} KRAVYADA ESPORTS</span></div></footer></main>}
