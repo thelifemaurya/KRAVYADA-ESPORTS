@@ -12,6 +12,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 
   return (
     <html lang="en">
+      <head>
+        {adsenseClient && (
+          <meta name="google-adsense-account" content={adsenseClient.replace(/^ca-/, '')} />
+        )}
+      </head>
       <body>
         {children}
         {adsenseClient && (
