@@ -392,7 +392,7 @@ p {
 
 .people {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   border-top: 1px solid var(--line);
 }
 .person {

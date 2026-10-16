@@ -42,7 +42,7 @@ export default function AboutPage() {
 
       <section className="section" aria-labelledby="people-title">
         <div className="section-head">
-          <h2 id="people-title">The people</h2>
+          <h2 id="people-title">Founder</h2>
         </div>
         <div className="people">
           <div className="person">
@@ -51,11 +51,6 @@ export default function AboutPage() {
             <p>
               Ayush founded KRAVYADA ESPORTS and leads the organisation, from scrims and tournaments to the community.
             </p>
-          </div>
-          <div className="person">
-            <p className="person-role">Management</p>
-            <h3>Dinesh Maurya</h3>
-            <p>Known as Ghost. Dinesh helps run the management side of KRAVYADA ESPORTS.</p>
           </div>
         </div>
       </section>

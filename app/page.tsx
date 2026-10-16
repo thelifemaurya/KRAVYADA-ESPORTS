@@ -156,8 +156,7 @@ export default function Home() {
               KRAVYADA ESPORTS was founded by Ayush Maurya and is not part of any other esports organisation.
             </p>
             <p className="muted">
-              Dinesh Maurya, known as Ghost, helps with management. The goal is simple: give players who are serious
-              about Free Fire room to practise, compete and improve.
+              The goal is simple: give players who are serious about Free Fire room to practise, compete and improve.
             </p>
             <p>
               <Link className="link" href="/about">
