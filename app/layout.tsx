@@ -47,6 +47,7 @@ const structuredData = {
       logo: LOGO_URL,
       description: 'KRAVYADA ESPORTS is an independent esports organization founded and led by Ayush Maurya.',
       founder: { '@id': `${SITE_URL}/#ayush-maurya` },
+      employee: [{ '@id': `${SITE_URL}/#dinesh-maurya` }],
       sameAs: [
         'https://www.instagram.com/kravyadaesports',
         'https://youtube.com/@kravyadaesports',
@@ -58,6 +59,14 @@ const structuredData = {
       '@id': `${SITE_URL}/#ayush-maurya`,
       name: 'Ayush Maurya',
       jobTitle: 'Founder & CEO',
+      worksFor: { '@id': `${SITE_URL}/#organization` },
+    },
+    {
+      '@type': 'Person',
+      '@id': `${SITE_URL}/#dinesh-maurya`,
+      name: 'Dinesh Maurya',
+      alternateName: 'Ghost',
+      jobTitle: 'Management',
       worksFor: { '@id': `${SITE_URL}/#organization` },
     },
     {
