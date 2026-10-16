@@ -1,21 +1,13 @@
 import type { MetadataRoute } from 'next'
 import { SITE_URL } from './site'
 
-// Served at /sitemap.xml. Single-page site: only the homepage is listed.
-// Add new routes here as pages are created.
+// Served at /sitemap.xml. Add new routes here as pages are created.
 export default function sitemap(): MetadataRoute.Sitemap {
+  const now = new Date()
   return [
-    {
-      url: `${SITE_URL}/`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 1,
-    },
-    {
-      url: `${SITE_URL}/about`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
+    { url: `${SITE_URL}/`, lastModified: now, changeFrequency: 'weekly', priority: 1 },
+    { url: `${SITE_URL}/scrims`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${SITE_URL}/about`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${SITE_URL}/join`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
   ]
 }

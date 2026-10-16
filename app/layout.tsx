@@ -1,11 +1,27 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
+import { Archivo } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
-import { SITE_URL, SITE_NAME, SITE_DESCRIPTION, LOGO_URL } from './site'
+import Nav from './components/Nav'
+import Footer from './components/Footer'
+import { SITE_URL, SITE_NAME, SITE_DESCRIPTION, LOGO_URL, SOCIAL } from './site'
+
+// One family, used at two widths: extended + heavy for display, normal for text.
+const archivo = Archivo({
+  subsets: ['latin'],
+  axes: ['wdth'],
+  display: 'swap',
+  variable: '--font-archivo',
+})
+
+const DEFAULT_TITLE = 'KRAVYADA ESPORTS | Independent Free Fire esports organisation'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: SITE_NAME,
+  title: {
+    default: DEFAULT_TITLE,
+    template: '%s | KRAVYADA ESPORTS',
+  },
   description: SITE_DESCRIPTION,
   alternates: {
     canonical: '/',
@@ -21,16 +37,20 @@ export const metadata: Metadata = {
     type: 'website',
     url: '/',
     siteName: SITE_NAME,
-    title: SITE_NAME,
+    title: DEFAULT_TITLE,
     description: SITE_DESCRIPTION,
-    images: [{ url: LOGO_URL, alt: SITE_NAME }],
+    images: [{ url: LOGO_URL, width: 1254, height: 1254, alt: 'KRAVYADA ESPORTS wolf logo' }],
   },
   twitter: {
     card: 'summary',
-    title: SITE_NAME,
+    title: DEFAULT_TITLE,
     description: SITE_DESCRIPTION,
     images: [LOGO_URL],
   },
+}
+
+export const viewport: Viewport = {
+  themeColor: '#070707',
 }
 
 // Structured data (invisible to visitors, read by search engines).
@@ -45,14 +65,11 @@ const structuredData = {
       alternateName: ['KRAVYADA', 'Kravyada Esports'],
       url: `${SITE_URL}/`,
       logo: LOGO_URL,
-      description: 'KRAVYADA ESPORTS is an independent esports organization founded and led by Ayush Maurya.',
+      description:
+        'KRAVYADA ESPORTS is an independent Free Fire esports organisation founded and led by Ayush Maurya.',
       founder: { '@id': `${SITE_URL}/#ayush-maurya` },
       employee: [{ '@id': `${SITE_URL}/#dinesh-maurya` }],
-      sameAs: [
-        'https://www.instagram.com/kravyadaesports',
-        'https://youtube.com/@kravyadaesports',
-        'https://discord.gg/sNdGHm9hEa',
-      ],
+      sameAs: [SOCIAL.instagram, 'https://youtube.com/@kravyadaesports', SOCIAL.discord],
     },
     {
       '@type': 'Person',
@@ -83,7 +100,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT
 
   return (
-    <html lang="en">
+    <html lang="en-IN" className={archivo.variable}>
       <head>
         <script
           type="application/ld+json"
@@ -96,7 +113,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         )}
       </head>
       <body>
-        {children}
+        <a className="skip" href="#main">
+          Skip to content
+        </a>
+        <Nav />
+        <main id="main">{children}</main>
+        <Footer />
         {adsenseClient && (
           <Script
             async
