@@ -3,7 +3,7 @@
 // (e.g. https://kravyadaesports.com) and redeploy: canonical, sitemap and
 // robots.txt will all follow automatically.
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://kravyadaesports-tan.vercel.app'
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://kravyadaesports.vercel.app'
 ).replace(/\/+$/, '')
 
 export const SITE_NAME = 'KRAVYADA ESPORTS'
