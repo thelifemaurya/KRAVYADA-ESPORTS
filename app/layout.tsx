@@ -1,10 +1,33 @@
 import type { Metadata } from 'next'
 import Script from 'next/script'
 import './globals.css'
+import { SITE_URL, SITE_NAME, SITE_DESCRIPTION, LOGO_URL } from './site'
 
 export const metadata: Metadata = {
-  title: 'KRAVYADA ESPORTS',
-  description: 'Compete. Conquer. Become KRAVYADA.',
+  metadataBase: new URL(SITE_URL),
+  title: SITE_NAME,
+  description: SITE_DESCRIPTION,
+  alternates: {
+    canonical: '/',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    type: 'website',
+    url: '/',
+    siteName: SITE_NAME,
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    images: [{ url: LOGO_URL, alt: SITE_NAME }],
+  },
+  twitter: {
+    card: 'summary',
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    images: [LOGO_URL],
+  },
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
