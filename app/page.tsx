@@ -4,6 +4,20 @@ import { EXTERNAL, SOCIAL } from './site'
 import { roster } from './data/roster'
 import { results } from './data/results'
 import { schedule } from './data/schedule'
+import Icon, { type IconName } from './components/Icon'
+import InstallApp from './components/InstallApp'
+import Reveal from './components/Reveal'
+
+type Tile = { title: string; note: string; icon: IconName; href: string; external?: boolean }
+
+const TILES: Tile[] = [
+  { title: 'Scrims', note: 'Schedule and lobbies', icon: 'crosshair', href: '/scrims' },
+  { title: 'Discord', note: 'Main community server', icon: 'chat', href: SOCIAL.discord, external: true },
+  { title: 'Paid scrims', note: 'Instagram page', icon: 'ticket', href: SOCIAL.paidScrims, external: true },
+  { title: 'Instagram', note: 'News and highlights', icon: 'instagram', href: SOCIAL.instagram, external: true },
+  { title: 'YouTube', note: 'Watch KRAVYADA', icon: 'youtube', href: SOCIAL.youtube, external: true },
+  { title: 'WhatsApp', note: 'Channel updates', icon: 'bell', href: SOCIAL.whatsapp, external: true },
+]
 
 export default function Home() {
   const nextUp = schedule.slice(0, 3)
@@ -25,16 +39,16 @@ export default function Home() {
         <div className="wrap hero-body">
           <p className="hero-kicker">Independent Free Fire esports organisation</p>
           <p className="hero-lede">
-            Regular scrims, community tournaments and a place for serious players to get better. Founded by Ayush
-            Maurya.
+            Regular scrims, community tournaments and a place for serious players to get better.
           </p>
           <div className="hero-actions">
             <Link className="btn btn-red" href="/join">
               Apply to play
             </Link>
-            <a className="btn" href={SOCIAL.discord} {...EXTERNAL}>
-              Join the Discord
-            </a>
+            <Link className="btn" href="/scrims">
+              See scrims
+            </Link>
+            <InstallApp className="btn btn-ghost" />
           </div>
           <h1 id="hero-title" className="wordmark" aria-label="KRAVYADA ESPORTS">
             <span className="wm-a">KRAV</span>
@@ -43,88 +57,103 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section" aria-labelledby="run-title">
+      <section className="section section-tight" aria-labelledby="quick-title">
         <div className="wrap">
-          <div className="section-head">
-            <h2 id="run-title">What we run</h2>
-            <p>Everything is built around one thing: more match practice against players who take it seriously.</p>
-          </div>
-          <ul className="rows">
-            <li className="row">
-              <h3>Scrims</h3>
-              <p>Regular Free Fire scrims for squads that want real practice, including paid lobbies.</p>
-              <Link className="link" href="/scrims">
-                See scrims
-              </Link>
-            </li>
-            <li className="row">
-              <h3>Tournaments</h3>
-              <p>Community tournaments organised by KRAVYADA, announced on Discord and Instagram.</p>
-              <a className="link" href={SOCIAL.instagram} {...EXTERNAL}>
-                Follow on Instagram
-              </a>
-            </li>
-            <li className="row">
-              <h3>Community</h3>
-              <p>A Discord server and a WhatsApp channel for players, squads and anyone who loves the game.</p>
-              <a className="link" href={SOCIAL.discord} {...EXTERNAL}>
-                Join the Discord
-              </a>
-            </li>
-          </ul>
+          <Reveal>
+            <div className="section-head">
+              <h2 id="quick-title">Quick access</h2>
+            </div>
+            <Link className="tile tile-feature" href="/join">
+              <span className="tile-icon">
+                <Icon name="join" size={26} />
+              </span>
+              <span className="tile-text">
+                <strong>Apply to play</strong>
+                <small>Send your Free Fire ID, role and device</small>
+              </span>
+            </Link>
+            <div className="tiles">
+              {TILES.map((tile) => {
+                const body = (
+                  <>
+                    <span className="tile-icon">
+                      <Icon name={tile.icon} size={22} />
+                    </span>
+                    <span className="tile-text">
+                      <strong>{tile.title}</strong>
+                      <small>{tile.note}</small>
+                    </span>
+                  </>
+                )
+                return tile.external ? (
+                  <a key={tile.title} className="tile" href={tile.href} {...EXTERNAL}>
+                    {body}
+                  </a>
+                ) : (
+                  <Link key={tile.title} className="tile" href={tile.href}>
+                    {body}
+                  </Link>
+                )
+              })}
+            </div>
+          </Reveal>
         </div>
       </section>
 
       <section className="section" aria-labelledby="scrims-title">
         <div className="wrap">
-          <div className="section-head">
-            <h2 id="scrims-title">Next scrims</h2>
-            <Link className="link" href="/scrims">
-              All scrims and tournaments
-            </Link>
-          </div>
-          {nextUp.length > 0 ? (
-            <ul className="rows">
-              {nextUp.map((item) => (
-                <li className="row" key={`${item.when}-${item.title}`}>
-                  <h3>{item.title}</h3>
-                  <p>{item.detail}</p>
-                  <span className="row-when">{item.when}</span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div className="empty">
-              <strong>No scrims are posted here right now.</strong>
-              Timings and lobby details go out on Discord and Instagram first.
-              <div className="hero-actions">
-                <a className="btn btn-red" href={SOCIAL.discord} {...EXTERNAL}>
-                  Open Discord
-                </a>
-                <a className="btn" href={SOCIAL.paidScrims} {...EXTERNAL}>
-                  Paid scrims on Instagram
-                </a>
-              </div>
+          <Reveal>
+            <div className="section-head">
+              <h2 id="scrims-title">Next scrims</h2>
+              <Link className="link" href="/scrims">
+                All scrims
+              </Link>
             </div>
-          )}
+            {nextUp.length > 0 ? (
+              <ul className="rows">
+                {nextUp.map((item) => (
+                  <li className="row" key={`${item.when}-${item.title}`}>
+                    <h3>{item.title}</h3>
+                    <p>{item.detail}</p>
+                    <span className="row-when">{item.when}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="empty">
+                <strong>No scrims are posted here right now.</strong>
+                Timings and lobby details go out on Discord and Instagram first.
+                <div className="hero-actions">
+                  <a className="btn btn-red" href={SOCIAL.discord} {...EXTERNAL}>
+                    Open Discord
+                  </a>
+                  <a className="btn" href={SOCIAL.paidScrims} {...EXTERNAL}>
+                    Paid scrims
+                  </a>
+                </div>
+              </div>
+            )}
+          </Reveal>
         </div>
       </section>
 
       {roster.length > 0 && (
         <section className="section" aria-labelledby="roster-title">
           <div className="wrap">
-            <div className="section-head">
-              <h2 id="roster-title">Roster</h2>
-            </div>
-            <div className="players">
-              {roster.map((player) => (
-                <article className="player" key={player.ign}>
-                  <h3>{player.ign}</h3>
-                  <p>{player.name}</p>
-                  {player.role && <p className="player-role">{player.role}</p>}
-                </article>
-              ))}
-            </div>
+            <Reveal>
+              <div className="section-head">
+                <h2 id="roster-title">Roster</h2>
+              </div>
+              <div className="players">
+                {roster.map((player) => (
+                  <article className="player" key={player.ign}>
+                    <h3>{player.ign}</h3>
+                    <p>{player.name}</p>
+                    {player.role && <p className="player-role">{player.role}</p>}
+                  </article>
+                ))}
+              </div>
+            </Reveal>
           </div>
         </section>
       )}
@@ -132,57 +161,40 @@ export default function Home() {
       {results.length > 0 && (
         <section className="section" aria-labelledby="results-title">
           <div className="wrap">
-            <div className="section-head">
-              <h2 id="results-title">Results</h2>
-            </div>
-            <ul className="rows">
-              {results.map((result) => (
-                <li className="row" key={`${result.event}-${result.placement}`}>
-                  <h3>{result.placement}</h3>
-                  <p>{result.event}</p>
-                  <span className="row-when">{result.date}</span>
-                </li>
-              ))}
-            </ul>
+            <Reveal>
+              <div className="section-head">
+                <h2 id="results-title">Results</h2>
+              </div>
+              <ul className="rows">
+                {results.map((result) => (
+                  <li className="row" key={`${result.event}-${result.placement}`}>
+                    <h3>{result.placement}</h3>
+                    <p>{result.event}</p>
+                    <span className="row-when">{result.date}</span>
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
           </div>
         </section>
       )}
 
-      <section className="section" aria-labelledby="who-title">
-        <div className="wrap split">
-          <h2 id="who-title">Run independently</h2>
-          <div>
-            <p className="lead">
-              KRAVYADA ESPORTS was founded by Ayush Maurya and is not part of any other esports organisation.
-            </p>
-            <p className="muted">
-              The goal is simple: give players who are serious about Free Fire room to practise, compete and improve.
-            </p>
-            <p>
-              <Link className="link" href="/about">
-                More about KRAVYADA
-              </Link>
-            </p>
-          </div>
-        </div>
-      </section>
-
       <section className="section" aria-labelledby="apply-title">
         <div className="wrap">
-          <div className="band">
-            <h2 id="apply-title">Want to play for KRAVYADA?</h2>
-            <p className="lead">
-              Send your Free Fire ID, role and device. The application goes to our Instagram DMs.
-            </p>
-            <div className="hero-actions">
-              <Link className="btn btn-red" href="/join">
-                Apply to play
-              </Link>
-              <a className="btn" href={SOCIAL.whatsapp} {...EXTERNAL}>
-                WhatsApp channel
-              </a>
+          <Reveal>
+            <div className="band">
+              <h2 id="apply-title">Want to play for KRAVYADA?</h2>
+              <p className="lead">Send your Free Fire ID, role and device. The application goes to our Instagram DMs.</p>
+              <div className="hero-actions">
+                <Link className="btn btn-red" href="/join">
+                  Apply to play
+                </Link>
+                <Link className="btn" href="/about">
+                  About KRAVYADA
+                </Link>
+              </div>
             </div>
-          </div>
+          </Reveal>
         </div>
       </section>
     </>

@@ -2,7 +2,8 @@ import type { Metadata, Viewport } from 'next'
 import { Archivo } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
-import Nav from './components/Nav'
+import AppNav from './components/AppNav'
+import PwaBoot from './components/PwaBoot'
 import Footer from './components/Footer'
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION, LOGO_URL, SOCIAL } from './site'
 
@@ -29,6 +30,10 @@ export const metadata: Metadata = {
   verification: {
     google: 'CzR2A3kpKbxqIJEPCPMkjla0Uo0cm6eWWi5Lw7MKEJ0',
   },
+  applicationName: 'KRAVYADA ESPORTS',
+  appleWebApp: { capable: true, title: 'KRAVYADA', statusBarStyle: 'black-translucent' },
+  icons: { apple: '/icons/apple-touch-icon.png' },
+  formatDetection: { telephone: false },
   robots: {
     index: true,
     follow: true,
@@ -50,7 +55,8 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#070707',
+  themeColor: '#08080a',
+  viewportFit: 'cover',
 }
 
 // Structured data (invisible to visitors, read by search engines).
@@ -116,9 +122,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <a className="skip" href="#main">
           Skip to content
         </a>
-        <Nav />
+        <AppNav />
         <main id="main">{children}</main>
         <Footer />
+        <PwaBoot />
         {adsenseClient && (
           <Script
             async
