@@ -33,12 +33,55 @@ export const metadata: Metadata = {
   },
 }
 
+// Structured data (invisible to visitors, read by search engines).
+// Declares KRAVYADA ESPORTS as an independent, solo-founded organization.
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': `${SITE_URL}/#organization`,
+      name: SITE_NAME,
+      alternateName: ['KRAVYADA', 'Kravyada Esports'],
+      url: `${SITE_URL}/`,
+      logo: LOGO_URL,
+      description: 'KRAVYADA ESPORTS is an independent esports organization founded and led by Ayush Maurya.',
+      founder: { '@id': `${SITE_URL}/#ayush-maurya` },
+      sameAs: [
+        'https://www.instagram.com/kravyadaesports',
+        'https://youtube.com/@kravyadaesports',
+        'https://discord.gg/sNdGHm9hEa',
+      ],
+    },
+    {
+      '@type': 'Person',
+      '@id': `${SITE_URL}/#ayush-maurya`,
+      name: 'Ayush Maurya',
+      jobTitle: 'Founder & CEO',
+      worksFor: { '@id': `${SITE_URL}/#organization` },
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE_URL}/#website`,
+      url: `${SITE_URL}/`,
+      name: SITE_NAME,
+      publisher: { '@id': `${SITE_URL}/#organization` },
+    },
+  ],
+}
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT
 
   return (
     <html lang="en">
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(structuredData).replace(/</g, '\\u003c'),
+          }}
+        />
         {adsenseClient && (
           <meta name="google-adsense-account" content={adsenseClient.replace(/^ca-/, '')} />
         )}
