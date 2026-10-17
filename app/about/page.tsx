@@ -70,6 +70,7 @@ const FOUNDING_LINEUP = [
   { ign: 'PHOEBUS', name: 'Surya' },
   { ign: 'SKULL', name: 'Vikas' },
   { ign: 'GHOST', name: 'Dinesh' },
+  { ign: 'MEET', name: 'Meet' },
 ]
 
 const PRINCIPLES = [
@@ -101,7 +102,7 @@ export default function AboutPage() {
           <div className="prose">
             <p>
               KRAVYADA did not begin as an organisation. It began as an ordinary Free Fire team that played scrims,
-              the same way thousands of squads do: Ayush Maurya, Phoebus (Surya), Skull (Vikas) and Ghost (Dinesh)
+              the same way thousands of squads do: Ayush Maurya, Phoebus (Surya), Skull (Vikas), Ghost (Dinesh) and Meet
               playing together. Nobody planned a brand. The team just kept showing up, kept playing and kept getting better.
             </p>
             <p>
@@ -126,7 +127,7 @@ export default function AboutPage() {
       <section className="section" aria-labelledby="lineup-title">
         <div className="section-head">
           <h2 id="lineup-title">The starting lineup</h2>
-          <p>The four players the team started with, before it became an organisation.</p>
+          <p>The players the team started with, before it became an organisation.</p>
         </div>
         <ul className="rows">
           {FOUNDING_LINEUP.map((player) => (
