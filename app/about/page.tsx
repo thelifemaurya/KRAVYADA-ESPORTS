@@ -65,6 +65,13 @@ const aboutJsonLd = {
   ],
 }
 
+const FOUNDING_LINEUP = [
+  { ign: 'PHOEBUS', name: 'Surya' },
+  { ign: 'SKULL', name: 'Vikas' },
+  { ign: 'GHOST', name: 'Dinesh' },
+  { ign: 'AYUSH', name: 'Ayush' },
+]
+
 const PRINCIPLES = [
   { name: 'Compete', text: 'Real matches against players who want to win. Scrims and tournaments are the point of everything else.' },
   { name: 'Conquer', text: 'The name is not given. It is earned, one match, one loss and one comeback at a time.' },
@@ -94,8 +101,8 @@ export default function AboutPage() {
           <div className="prose">
             <p>
               KRAVYADA did not begin as an organisation. It began as an ordinary Free Fire team that played scrims,
-              the same way thousands of squads do, with Ayush Maurya playing alongside everyone else. Nobody planned a
-              brand. The team just kept showing up, kept playing and kept getting better.
+              the same way thousands of squads do: Phoebus (Surya), Skull (Vikas), Ghost (Dinesh) and Ayush Maurya
+              playing together. Nobody planned a brand. The team just kept showing up, kept playing and kept getting better.
             </p>
             <p>
               Slowly that team became a proper lineup, with set roles, regular practice and a standard people
@@ -114,6 +121,22 @@ export default function AboutPage() {
             </p>
           </div>
         </div>
+      </section>
+
+      <section className="section" aria-labelledby="lineup-title">
+        <div className="section-head">
+          <h2 id="lineup-title">The starting lineup</h2>
+          <p>The four players the team started with, before it became an organisation.</p>
+        </div>
+        <ul className="rows">
+          {FOUNDING_LINEUP.map((player) => (
+            <li className="row" key={player.ign}>
+              <h3>{player.ign}</h3>
+              <p>{player.name}</p>
+              <span className="row-when">Starting lineup</span>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="section" aria-labelledby="do-title">
