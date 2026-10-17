@@ -974,3 +974,15 @@ a.path:active {
 .room-ids div { border: 1px solid #ffffff1f; padding: 0.9rem 1rem; }
 .room-ids dt { color: var(--steel); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; }
 .room-ids dd { margin: 0.25rem 0 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 1.4rem; color: #fff; user-select: all; word-break: break-all; }
+
+/* Event cards and banners */
+.event-cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr)); gap: 1rem; }
+.event-card { display: flex; flex-direction: column; border: 1px solid #ffffff1f; background: #0e0e12; }
+.event-banner { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; display: block; background: #15151a; }
+.event-body { display: grid; gap: 0.5rem; padding: 1rem; align-content: start; flex: 1; }
+.event-body h3 { margin: 0; }
+.event-body p { margin: 0; color: var(--steel); }
+.banner-field { display: grid; gap: 0.5rem; }
+.banner-preview { width: 100%; max-width: 20rem; aspect-ratio: 16 / 9; object-fit: cover; border: 1px solid #ffffff1f; }
+.banner-remove { font-size: 0.875rem; color: var(--steel); display: flex; gap: 0.5rem; align-items: center; }
+.admin-thumb { width: 3.5rem; aspect-ratio: 16 / 9; object-fit: cover; vertical-align: middle; margin-right: 0.6rem; border: 1px solid #ffffff1f; }

@@ -36,7 +36,7 @@ function when(iso: string) {
 export default function RegisterClient({ events }: { events: OpenEvent[] }) {
   return (
     <>
-      <section className="section" aria-labelledby="reg-title">
+      <section className="section" id="register" aria-labelledby="reg-title">
         <div className="section-head">
           <h2 id="reg-title">1. Register your squad</h2>
         </div>
@@ -57,6 +57,13 @@ function RegisterForm({ events }: { events: OpenEvent[] }) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [code, setCode] = useState('')
+  const [approved, setApproved] = useState(false)
+  const [preselect, setPreselect] = useState('')
+
+  useEffect(() => {
+    const wanted = new URLSearchParams(window.location.search).get('event')
+    if (wanted && events.some((e) => `${e.type}:${e.id}` === wanted)) setPreselect(wanted)
+  }, [events])
 
   if (events.length === 0) {
     return (
@@ -75,7 +82,7 @@ function RegisterForm({ events }: { events: OpenEvent[] }) {
     const data = new FormData(form)
     const [type, id] = String(data.get('event')).split(':')
     try {
-      const out = await rpc<{ ok: boolean; code?: string; error?: string }>('register_for_event', {
+      const out = await rpc<{ ok: boolean; code?: string; status?: string; error?: string }>('register_for_event', {
         p_event_type: type,
         p_event_id: id,
         p_team_name: String(data.get('team')),
@@ -87,6 +94,7 @@ function RegisterForm({ events }: { events: OpenEvent[] }) {
         setError(out.error || 'Could not register.')
       } else {
         setCode(out.code)
+        setApproved(out.status === 'approved')
         try {
           localStorage.setItem(CODE_KEY, out.code)
         } catch {
@@ -103,8 +111,12 @@ function RegisterForm({ events }: { events: OpenEvent[] }) {
   if (code) {
     return (
       <div className="band">
-        <h3>You are registered</h3>
-        <p className="lead">Your access code is below. Save it. You need it to see your status and the room ID and password.</p>
+        <h3>{approved ? 'Slot confirmed' : 'Registration received'}</h3>
+        <p className="lead">
+          {approved
+            ? 'You got a slot. Save your access code below. Use it to get the room ID and password once they are published.'
+            : 'We will approve your registration after checking it. Save your access code below. Use it to see your status and, once approved, the room ID and password.'}
+        </p>
         <p className="reg-code" aria-label="Access code">{code}</p>
         <div className="hero-actions">
           <button className="btn btn-red" onClick={() => navigator.clipboard?.writeText(code)}>
@@ -125,7 +137,7 @@ function RegisterForm({ events }: { events: OpenEvent[] }) {
     <form className="form" onSubmit={submit}>
       <div className="field">
         <label htmlFor="event">Event</label>
-        <select id="event" name="event" required defaultValue="">
+        <select id="event" name="event" required key={preselect} defaultValue={preselect}>
           <option value="" disabled>
             Choose a scrim or tournament
           </option>

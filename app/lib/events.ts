@@ -11,6 +11,8 @@ export type Scrim = {
   status: 'upcoming' | 'live' | 'completed' | 'cancelled'
   notes: string | null
   registration_open: boolean
+  banner_url: string | null
+  approval_mode: 'default' | 'auto' | 'manual'
 }
 
 export type Tournament = {
@@ -26,6 +28,8 @@ export type Tournament = {
   status: 'upcoming' | 'registration_open' | 'live' | 'completed' | 'cancelled'
   description: string | null
   registration_open: boolean
+  banner_url: string | null
+  approval_mode: 'default' | 'auto' | 'manual'
 }
 
 async function load<T>(path: string): Promise<T[]> {
@@ -107,4 +111,10 @@ export async function getOpenEvents(): Promise<OpenEvent[]> {
     ...tournaments.map((e) => ({ type: 'tournament' as const, id: e.id, title: e.title, starts_at: e.starts_at, entry_fee: e.entry_fee, slots: e.slots })),
   ]
   return all.sort((a, b) => a.starts_at.localeCompare(b.starts_at))
+}
+
+// Free events are first come first serve by default, paid events need manual approval.
+// An admin can force either way per event.
+export function isAutoApproval(e: { entry_fee: number; approval_mode: 'default' | 'auto' | 'manual' }) {
+  return e.approval_mode === 'auto' || (e.approval_mode === 'default' && e.entry_fee === 0)
 }

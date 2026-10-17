@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { EXTERNAL, SOCIAL } from '../site'
-import { formatWhen, getUpcomingScrims, getUpcomingTournaments, scrimDetail, tournamentDetail } from '../lib/events'
+import { getUpcomingScrims, getUpcomingTournaments } from '../lib/events'
+import EventCards from '../components/EventCards'
 
 export const revalidate = 60
 
@@ -68,15 +69,7 @@ export default async function ScrimsPage() {
           <h2 id="upcoming-title">Upcoming scrims</h2>
         </div>
         {scrims.length > 0 ? (
-          <ul className="rows">
-            {scrims.map((item) => (
-              <li className="row" key={item.id}>
-                <h3>{item.title}</h3>
-                <p>{scrimDetail(item)}</p>
-                <span className="row-when">{formatWhen(item.starts_at)}</span>
-              </li>
-            ))}
-          </ul>
+          <EventCards items={scrims.map((data) => ({ kind: 'scrim' as const, data }))} />
         ) : (
           <div className="empty">
             <strong>No scrims are scheduled right now.</strong>
@@ -90,25 +83,7 @@ export default async function ScrimsPage() {
           <div className="section-head">
             <h2 id="tournaments-title">Tournaments</h2>
           </div>
-          <ul className="rows">
-            {tournaments.map((item) => (
-              <li className="row" key={item.id}>
-                <h3>{item.title}</h3>
-                <p>
-                  {tournamentDetail(item)}
-                  {item.registration_url && item.status === 'registration_open' && (
-                    <>
-                      {' '}
-                      <a className="link" href={item.registration_url} {...EXTERNAL}>
-                        Register
-                      </a>
-                    </>
-                  )}
-                </p>
-                <span className="row-when">{formatWhen(item.starts_at)}</span>
-              </li>
-            ))}
-          </ul>
+          <EventCards items={tournaments.map((data) => ({ kind: 'tournament' as const, data }))} />
         </section>
       )}
 

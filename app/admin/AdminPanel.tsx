@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { AUTH, REST, SUPABASE_KEY } from '../lib/supabase'
+import { AUTH, REST, SUPABASE_KEY, SUPABASE_URL } from '../lib/supabase'
 
 type Session = { access_token: string; refresh_token: string; expires_at: number; email: string }
 type Val = string | number | boolean | null
@@ -11,9 +11,10 @@ type Kind = 'scrims' | 'tournaments'
 type Field = {
   name: string
   label: string
-  type: 'text' | 'number' | 'datetime' | 'select' | 'url' | 'textarea' | 'checkbox'
+  type: 'text' | 'number' | 'datetime' | 'select' | 'url' | 'textarea' | 'checkbox' | 'image'
   required?: boolean
   options?: string[]
+  optionLabels?: Record<string, string>
   help?: string
 }
 
@@ -27,6 +28,18 @@ const FIELDS: Record<Kind, Field[]> = {
     { name: 'entry_fee', label: 'Entry fee (₹)', type: 'number', help: '0 for free' },
     { name: 'status', label: 'Status', type: 'select', options: ['upcoming', 'live', 'completed', 'cancelled'] },
     { name: 'registration_open', label: 'Registration open', type: 'checkbox', help: 'Players can register while this is on.' },
+    {
+      name: 'approval_mode',
+      label: 'Approval',
+      type: 'select',
+      options: ['default', 'auto', 'manual'],
+      optionLabels: {
+        default: 'Automatic: free = first come first serve, paid = manual approval',
+        auto: 'Always auto-approve (first come first serve)',
+        manual: 'Always approve manually',
+      },
+    },
+    { name: 'banner_url', label: 'Banner / thumbnail', type: 'image', help: 'JPG, PNG or WebP, up to 3 MB. 16:9 looks best.' },
     { name: 'notes', label: 'Notes', type: 'textarea', help: 'Shown to the public. Do not put room ID or password here.' },
   ],
   tournaments: [
@@ -45,6 +58,18 @@ const FIELDS: Record<Kind, Field[]> = {
       options: ['upcoming', 'registration_open', 'live', 'completed', 'cancelled'],
     },
     { name: 'registration_open', label: 'Registration open', type: 'checkbox', help: 'Players can register while this is on.' },
+    {
+      name: 'approval_mode',
+      label: 'Approval',
+      type: 'select',
+      options: ['default', 'auto', 'manual'],
+      optionLabels: {
+        default: 'Automatic: free = first come first serve, paid = manual approval',
+        auto: 'Always auto-approve (first come first serve)',
+        manual: 'Always approve manually',
+      },
+    },
+    { name: 'banner_url', label: 'Banner / thumbnail', type: 'image', help: 'JPG, PNG or WebP, up to 3 MB. 16:9 looks best.' },
     { name: 'description', label: 'Description', type: 'textarea' },
   ],
 }
@@ -133,6 +158,25 @@ export default function AdminPanel() {
         throw new Error(message)
       }
       return res.status === 204 ? null : res.json()
+    },
+    [getToken],
+  )
+
+  const uploadBanner = useCallback(
+    async (current: Session, file: File): Promise<string> => {
+      const allowed: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' }
+      const ext = allowed[file.type]
+      if (!ext) throw new Error('Banner must be a JPG, PNG or WebP image.')
+      if (file.size > 3 * 1024 * 1024) throw new Error('Banner must be 3 MB or smaller.')
+      const token = await getToken(current)
+      const name = `${crypto.randomUUID()}.${ext}`
+      const res = await fetch(`${SUPABASE_URL}/storage/v1/object/event-banners/${name}`, {
+        method: 'POST',
+        headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${token}`, 'Content-Type': file.type },
+        body: file,
+      })
+      if (!res.ok) throw new Error('Banner upload failed. Please try again.')
+      return `${SUPABASE_URL}/storage/v1/object/public/event-banners/${name}`
     },
     [getToken],
   )
@@ -227,13 +271,24 @@ export default function AdminPanel() {
       email={session.email}
       signOut={signOut}
       api={(path, init) => authed(session, path, init)}
+      upload={(file) => uploadBanner(session, file)}
     />
   )
 }
 
 type Api = (path: string, init?: RequestInit) => Promise<unknown>
 
-function Dashboard({ email, signOut, api }: { email: string; signOut: () => void; api: Api }) {
+function Dashboard({
+  email,
+  signOut,
+  api,
+  upload,
+}: {
+  email: string
+  signOut: () => void
+  api: Api
+  upload: (file: File) => Promise<string>
+}) {
   const [kind, setKind] = useState<Kind>('scrims')
   const [view, setView] = useState<'events' | 'registrations'>('events')
   const [rows, setRows] = useState<Row[]>([])
@@ -337,6 +392,7 @@ function Dashboard({ email, signOut, api }: { email: string; signOut: () => void
           row={editing === 'new' ? null : editing}
           onCancel={() => setEditing(null)}
           onSave={save}
+          upload={upload}
         />
       ) : (
         <>
@@ -356,7 +412,13 @@ function Dashboard({ email, signOut, api }: { email: string; signOut: () => void
             <ul className="rows admin-list">
               {rows.map((row) => (
                 <li className="row" key={row.id}>
-                  <h3>{row.title}</h3>
+                  <h3>
+                    {row.banner_url && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img className="admin-thumb" src={String(row.banner_url)} alt="" />
+                    )}
+                    {row.title}
+                  </h3>
                   <p>
                     {new Date(String(row.starts_at)).toLocaleString('en-IN', {
                       timeZone: 'Asia/Kolkata',
@@ -400,34 +462,49 @@ function EditForm({
   row,
   onCancel,
   onSave,
+  upload,
 }: {
   fields: Field[]
   row: Row | null
+  upload: (file: File) => Promise<string>
   onCancel: () => void
   onSave: (values: Record<string, Val>, id?: string) => Promise<void>
 }) {
   const [busy, setBusy] = useState(false)
+  const [formError, setFormError] = useState('')
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setBusy(true)
+    setFormError('')
     const data = new FormData(event.currentTarget)
     const values: Record<string, Val> = {}
-    for (const f of fields) {
-      const raw = String(data.get(f.name) ?? '').trim()
-      if (f.type === 'checkbox') values[f.name] = data.has(f.name)
-      else if (f.type === 'datetime') values[f.name] = fromInput(raw)
-      else if (f.type === 'number') values[f.name] = raw === '' ? (f.name === 'entry_fee' ? 0 : null) : Number(raw)
-      else values[f.name] = raw === '' && !f.required && f.type !== 'select' ? null : raw
+    try {
+      for (const f of fields) {
+        if (f.type === 'image') {
+          const file = data.get(f.name)
+          if (file instanceof File && file.size > 0) values[f.name] = await upload(file)
+          else if (data.has(`${f.name}__remove`)) values[f.name] = null
+          else values[f.name] = row ? (row[f.name] ?? null) : null
+          continue
+        }
+        const raw = String(data.get(f.name) ?? '').trim()
+        if (f.type === 'checkbox') values[f.name] = data.has(f.name)
+        else if (f.type === 'datetime') values[f.name] = fromInput(raw)
+        else if (f.type === 'number') values[f.name] = raw === '' ? (f.name === 'entry_fee' ? 0 : null) : Number(raw)
+        else values[f.name] = raw === '' && !f.required && f.type !== 'select' ? null : raw
+      }
+      await onSave(values, row?.id)
+    } catch (e) {
+      setFormError(e instanceof Error ? e.message : 'Could not save')
     }
-    await onSave(values, row?.id)
     setBusy(false)
   }
 
   return (
     <form className="form" onSubmit={submit}>
       {fields.map((f) => {
-        const initial = row ? row[f.name] : f.name === 'status' ? 'upcoming' : f.name === 'entry_fee' ? 0 : ''
+        const initial = row ? row[f.name] : f.name === 'status' ? 'upcoming' : f.name === 'approval_mode' ? 'default' : f.name === 'entry_fee' ? 0 : ''
         const common = { id: `f-${f.name}`, name: f.name, required: f.required }
         return (
           <div className="field" key={f.name}>
@@ -443,10 +520,23 @@ function EditForm({
               <select {...common} defaultValue={String(initial ?? '')}>
                 {f.options?.map((o) => (
                   <option key={o} value={o}>
-                    {o.replace('_', ' ')}
+                    {f.optionLabels?.[o] ?? o.replace('_', ' ')}
                   </option>
                 ))}
               </select>
+            ) : f.type === 'image' ? (
+              <div className="banner-field">
+                {row && row[f.name] && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img className="banner-preview" src={String(row[f.name])} alt="Current banner" />
+                )}
+                <input id={common.id} name={f.name} type="file" accept="image/jpeg,image/png,image/webp" />
+                {row && row[f.name] && (
+                  <label className="banner-remove">
+                    <input type="checkbox" name={`${f.name}__remove`} /> Remove current banner
+                  </label>
+                )}
+              </div>
             ) : f.type === 'textarea' ? (
               <textarea {...common} rows={3} defaultValue={String(initial ?? '')} />
             ) : f.type === 'datetime' ? (
@@ -471,6 +561,7 @@ function EditForm({
           Cancel
         </button>
       </div>
+      {formError && <p className="form-status" role="alert">{formError}</p>}
     </form>
   )
 }

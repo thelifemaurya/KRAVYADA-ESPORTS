@@ -3,7 +3,8 @@ import Link from 'next/link'
 import { EXTERNAL, SOCIAL } from './site'
 import { roster } from './data/roster'
 import { results } from './data/results'
-import { formatWhen, getUpcomingScrims, scrimDetail } from './lib/events'
+import { getUpcomingScrims } from './lib/events'
+import EventCards from './components/EventCards'
 import Icon, { type IconName } from './components/Icon'
 import InstallApp from './components/InstallApp'
 import Reveal from './components/Reveal'
@@ -103,15 +104,7 @@ export default async function Home() {
               </Link>
             </div>
             {nextUp.length > 0 ? (
-              <ul className="rows">
-                {nextUp.map((item) => (
-                  <li className="row" key={item.id}>
-                    <h3>{item.title}</h3>
-                    <p>{scrimDetail(item)}</p>
-                    <span className="row-when">{formatWhen(item.starts_at)}</span>
-                  </li>
-                ))}
-              </ul>
+              <EventCards items={nextUp.map((data) => ({ kind: 'scrim' as const, data }))} />
             ) : (
               <div className="empty">
                 <strong>No scrims are posted here right now.</strong>
