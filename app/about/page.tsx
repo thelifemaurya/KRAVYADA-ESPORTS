@@ -69,7 +69,7 @@ const FOUNDING_LINEUP = [
   { ign: 'PHOEBUS', name: 'Surya' },
   { ign: 'SKULL', name: 'Vikas' },
   { ign: 'GHOST', name: 'Dinesh' },
-  { ign: 'AYUSH', name: 'Ayush' },
+  { ign: 'AYUSH', name: 'Ayush Maurya', note: 'Founder & CEO' },
 ]
 
 const PRINCIPLES = [
@@ -106,8 +106,8 @@ export default function AboutPage() {
             </p>
             <p>
               Slowly that team became a proper lineup, with set roles, regular practice and a standard people
-              held each other to. Once the lineup was real, it made sense to build something around it, and the team
-              grew into the organisation that is now KRAVYADA ESPORTS.
+              held each other to. Once the lineup was real, Ayush Maurya, the founder, built an organisation around it,
+              and the team grew into what is now KRAVYADA ESPORTS.
             </p>
             <p>
               Because it grew from the inside, KRAVYADA is independent. There is no parent company, no umbrella brand
@@ -133,7 +133,7 @@ export default function AboutPage() {
             <li className="row" key={player.ign}>
               <h3>{player.ign}</h3>
               <p>{player.name}</p>
-              <span className="row-when">Starting lineup</span>
+              <span className="row-when">{'note' in player ? player.note : 'Starting lineup'}</span>
             </li>
           ))}
         </ul>
