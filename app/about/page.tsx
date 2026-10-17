@@ -5,7 +5,7 @@ import { milestones } from '../data/about'
 
 const TITLE = 'About KRAVYADA ESPORTS'
 const DESCRIPTION =
-  'The story of KRAVYADA ESPORTS: an independent Free Fire esports organisation running scrims, tournaments and team trials for serious players. Not part of any other organisation.'
+  'The story of KRAVYADA ESPORTS: a Free Fire scrim team that grew into a lineup and then an independent esports organisation running scrims, tournaments and team trials. Not part of any other organisation.'
 
 export const metadata: Metadata = {
   title: 'About',
@@ -25,7 +25,7 @@ const FAQ = [
   },
   {
     q: 'Who runs KRAVYADA ESPORTS?',
-    a: 'KRAVYADA ESPORTS was founded by Ayush Maurya, who leads the organisation and runs it under the KRAVYADA name.',
+    a: 'KRAVYADA ESPORTS grew out of a Free Fire scrim team that became a full lineup and then an organisation. It was founded by Ayush Maurya, who leads it under the KRAVYADA name.',
   },
   {
     q: 'How do I join a KRAVYADA scrim?',
@@ -93,19 +93,24 @@ export default function AboutPage() {
           <h2 id="story-title">The story</h2>
           <div className="prose">
             <p>
-              KRAVYADA started as a one-person project. Ayush Maurya set out to build a place where Free Fire players
-              who take the game seriously could find consistent scrims, proper tournaments and people worth
-              competing with, without needing the backing of a larger organisation. That is still how it works. There
-              is no parent company, no umbrella brand and no partner team behind the name.
+              KRAVYADA did not begin as an organisation. It began as an ordinary Free Fire team that played scrims,
+              the same way thousands of squads do, with Ayush Maurya playing alongside everyone else. Nobody planned a
+              brand. The team just kept showing up, kept playing and kept getting better.
             </p>
             <p>
-              Everything under the KRAVYADA name is run directly: the scrims, the paid lobbies, the community
-              tournaments and the team trials. The Discord server is where players meet, Instagram and WhatsApp carry
-              announcements, and YouTube holds the content around it.
+              Slowly that team became a proper lineup, with set roles, regular practice and a standard people
+              held each other to. Once the lineup was real, it made sense to build something around it, and the team
+              grew into the organisation that is now KRAVYADA ESPORTS.
             </p>
             <p>
-              Being independent keeps KRAVYADA focused on one standard: show up, play properly and improve. The goal
-              is simple, to give serious players room to rise.
+              Because it grew from the inside, KRAVYADA is independent. There is no parent company, no umbrella brand
+              and no partner team behind the name. Everything is run directly: the scrims, the paid lobbies, the
+              community tournaments and the team trials. The Discord server is where players meet, Instagram and
+              WhatsApp carry announcements, and YouTube holds the content around it.
+            </p>
+            <p>
+              The standard is the same as it was on day one: show up, play properly and improve. The goal is simple, to
+              give serious players room to rise.
             </p>
           </div>
         </div>
