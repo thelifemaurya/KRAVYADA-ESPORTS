@@ -53,6 +53,14 @@ export default async function ScrimsPage() {
           Scrims are practice matches against other squads, and you do not need to be on the KRAVYADA team to play
           them. Upcoming scrims and tournaments are listed here as they are confirmed.
         </p>
+        <div className="hero-actions">
+          <Link className="btn btn-red" href="/register">
+            Register for a scrim
+          </Link>
+          <Link className="btn" href="/register#room">
+            Get ID and password
+          </Link>
+        </div>
       </header>
 
       <section className="section" aria-labelledby="upcoming-title">

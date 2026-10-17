@@ -52,8 +52,8 @@ export default async function Home() {
               Regular scrims, community tournaments and a place for serious players to get better.
             </p>
             <div className="hero-actions">
-              <Link className="btn btn-red" href="/scrims">
-                Join scrims
+              <Link className="btn btn-red" href="/register">
+                Register for scrims
               </Link>
               <Link className="btn" href="/trials">
                 Team trials
@@ -98,8 +98,8 @@ export default async function Home() {
           <Reveal>
             <div className="section-head">
               <h2 id="scrims-title">Next scrims</h2>
-              <Link className="link" href="/scrims">
-                All scrims
+              <Link className="btn btn-red btn-sm" href="/register">
+                Register
               </Link>
             </div>
             {nextUp.length > 0 ? (

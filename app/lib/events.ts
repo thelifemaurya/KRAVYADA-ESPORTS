@@ -97,9 +97,9 @@ export type OpenEvent = {
 // Events people can register for right now, scrims and tournaments together, soonest first.
 export async function getOpenEvents(): Promise<OpenEvent[]> {
   const [scrims, tournaments] = await Promise.all([
-    load<Scrim>('scrims?select=*&status=eq.upcoming&registration_open=eq.true&order=starts_at.asc'),
+    load<Scrim>('scrims?select=*&status=in.(upcoming,live)&registration_open=eq.true&order=starts_at.asc'),
     load<Tournament>(
-      'tournaments?select=*&status=in.(upcoming,registration_open)&registration_open=eq.true&order=starts_at.asc',
+      'tournaments?select=*&status=in.(upcoming,registration_open,live)&registration_open=eq.true&order=starts_at.asc',
     ),
   ])
   const all: OpenEvent[] = [
