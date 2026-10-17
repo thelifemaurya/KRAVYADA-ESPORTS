@@ -23,7 +23,7 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
     shortcuts: [
       { name: 'Scrims', url: '/scrims', icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }] },
-      { name: 'Apply to play', url: '/join', icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }] },
+      { name: 'Team trials', url: '/trials', icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }] },
     ],
   }
 }

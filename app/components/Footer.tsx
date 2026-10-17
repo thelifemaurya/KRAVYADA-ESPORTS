@@ -13,7 +13,7 @@ export default function Footer() {
 
         <div className="footer-grid">
           <p className="footer-about">
-            An independent Free Fire esports organisation, founded by Ayush Maurya.
+            An independent Free Fire esports organisation. Not part of any other organisation.
           </p>
 
           <nav aria-label="Footer" className="footer-cols">
@@ -28,7 +28,7 @@ export default function Footer() {
                 <Link href="/about">About</Link>
               </li>
               <li>
-                <Link href="/join">Apply to play</Link>
+                <Link href="/trials">Team trials</Link>
               </li>
             </ul>
             <ul>
@@ -61,7 +61,7 @@ export default function Footer() {
           </nav>
         </div>
 
-        <p className="footer-legal">© {new Date().getFullYear()} KRAVYADA ESPORTS. Founded by Ayush Maurya.</p>
+        <p className="footer-legal">© {new Date().getFullYear()} KRAVYADA ESPORTS. All rights reserved.</p>
       </div>
     </footer>
   )

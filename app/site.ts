@@ -8,7 +8,7 @@ export const SITE_URL = (
 
 export const SITE_NAME = 'KRAVYADA ESPORTS'
 export const SITE_DESCRIPTION =
-  'KRAVYADA ESPORTS is an independent Free Fire esports organisation founded by Ayush Maurya. Regular scrims, tournaments and a player-first community.'
+  'KRAVYADA ESPORTS (Kravyada Esports) is an independent Free Fire esports organisation founded by Ayush Maurya. Join scrims, try out for the team and follow tournaments.'
 export const LOGO_URL = `${SITE_URL}/kravyada-logo.jpg`
 
 export const SOCIAL = {

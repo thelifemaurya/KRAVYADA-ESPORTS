@@ -3,10 +3,10 @@
    - /_next/static files: cache first (their names change whenever the content changes).
    - Images and fonts: serve from cache, refresh in the background.
    Bump VERSION to clear old caches. */
-const VERSION = 'v1'
+const VERSION = 'v2'
 const PAGES = 'kv-pages-' + VERSION
 const ASSETS = 'kv-assets-' + VERSION
-const PRECACHE = ['/', '/scrims', '/about', '/join', '/offline', '/kravyada-logo.jpg', '/icons/icon-192.png']
+const PRECACHE = ['/', '/scrims', '/about', '/trials', '/offline', '/kravyada-logo.jpg', '/icons/icon-192.png']
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

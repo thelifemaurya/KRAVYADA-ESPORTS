@@ -8,15 +8,13 @@ import Icon, { type IconName } from './components/Icon'
 import InstallApp from './components/InstallApp'
 import Reveal from './components/Reveal'
 
-type Tile = { title: string; note: string; icon: IconName; href: string; external?: boolean }
+type Tile = { title: string; note: string; icon: IconName; href: string }
 
 const TILES: Tile[] = [
-  { title: 'Scrims', note: 'Schedule and lobbies', icon: 'crosshair', href: '/scrims' },
-  { title: 'Discord', note: 'Main community server', icon: 'chat', href: SOCIAL.discord, external: true },
-  { title: 'Paid scrims', note: 'Instagram page', icon: 'ticket', href: SOCIAL.paidScrims, external: true },
-  { title: 'Instagram', note: 'News and highlights', icon: 'instagram', href: SOCIAL.instagram, external: true },
-  { title: 'YouTube', note: 'Watch KRAVYADA', icon: 'youtube', href: SOCIAL.youtube, external: true },
-  { title: 'WhatsApp', note: 'Channel updates', icon: 'bell', href: SOCIAL.whatsapp, external: true },
+  { title: 'Discord', note: 'Main community server', icon: 'chat', href: SOCIAL.discord },
+  { title: 'Instagram', note: 'News and highlights', icon: 'instagram', href: SOCIAL.instagram },
+  { title: 'YouTube', note: 'Watch KRAVYADA', icon: 'youtube', href: SOCIAL.youtube },
+  { title: 'WhatsApp', note: 'Channel updates', icon: 'bell', href: SOCIAL.whatsapp },
 ]
 
 export default function Home() {
@@ -25,76 +23,69 @@ export default function Home() {
   return (
     <>
       <section className="hero" aria-labelledby="hero-title">
-        <div className="hero-art" aria-hidden="true">
-          <Image
-            src="/kravyada-logo.jpg"
-            alt=""
-            width={1254}
-            height={1254}
-            priority
-            sizes="(max-width: 760px) 130vw, 72vw"
-          />
-        </div>
-
-        <div className="wrap hero-body">
-          <p className="hero-kicker">Independent Free Fire esports organisation</p>
-          <p className="hero-lede">
-            Regular scrims, community tournaments and a place for serious players to get better.
-          </p>
-          <div className="hero-actions">
-            <Link className="btn btn-red" href="/join">
-              Apply to play
-            </Link>
-            <Link className="btn" href="/scrims">
-              See scrims
-            </Link>
-            <InstallApp className="btn btn-ghost" />
+        <div className="wrap hero-grid">
+          <div className="hero-art" aria-hidden="true">
+            <Image
+              src="/kravyada-logo.jpg"
+              alt=""
+              width={1254}
+              height={1254}
+              priority
+              sizes="(max-width: 900px) 70vw, 480px"
+            />
           </div>
-          <h1 id="hero-title" className="wordmark" aria-label="KRAVYADA ESPORTS">
-            <span className="wm-a">KRAV</span>
-            <span className="wm-b">YADA</span>
-          </h1>
+
+          <div className="hero-copy">
+            <h1 id="hero-title" className="wordmark">
+              <span className="wm-line">Compete.</span>
+              <span className="wm-line">Conquer.</span>
+              <span className="wm-line wm-soft">Become</span>
+              <span className="wm-line">
+                <span className="wm-a">KRAV</span>
+                <span className="wm-b">YADA</span>
+              </span>
+            </h1>
+            <p className="hero-kicker">Independent Free Fire esports organisation</p>
+            <p className="hero-lede">
+              Regular scrims, community tournaments and a place for serious players to get better.
+            </p>
+            <div className="hero-actions">
+              <Link className="btn btn-red" href="/scrims">
+                Join scrims
+              </Link>
+              <Link className="btn" href="/trials">
+                Team trials
+              </Link>
+              <InstallApp className="btn btn-ghost" />
+            </div>
+          </div>
         </div>
       </section>
 
-      <section className="section section-tight" aria-labelledby="quick-title">
+      <section className="section" aria-labelledby="paths-title">
         <div className="wrap">
           <Reveal>
             <div className="section-head">
-              <h2 id="quick-title">Quick access</h2>
+              <h2 id="paths-title">Choose your path</h2>
+              <p>Two different things. Pick the one you came for.</p>
             </div>
-            <Link className="tile tile-feature" href="/join">
-              <span className="tile-icon">
-                <Icon name="join" size={26} />
-              </span>
-              <span className="tile-text">
-                <strong>Apply to play</strong>
-                <small>Send your Free Fire ID, role and device</small>
-              </span>
-            </Link>
-            <div className="tiles">
-              {TILES.map((tile) => {
-                const body = (
-                  <>
-                    <span className="tile-icon">
-                      <Icon name={tile.icon} size={22} />
-                    </span>
-                    <span className="tile-text">
-                      <strong>{tile.title}</strong>
-                      <small>{tile.note}</small>
-                    </span>
-                  </>
-                )
-                return tile.external ? (
-                  <a key={tile.title} className="tile" href={tile.href} {...EXTERNAL}>
-                    {body}
-                  </a>
-                ) : (
-                  <Link key={tile.title} className="tile" href={tile.href}>
-                    {body}
-                  </Link>
-                )
-              })}
+            <div className="paths">
+              <Link className="path path-steel" href="/scrims">
+                <span className="path-icon">
+                  <Icon name="crosshair" size={26} />
+                </span>
+                <h3>Join scrims</h3>
+                <p>Practice matches against other squads, including paid lobbies. Open to everyone, no team needed.</p>
+                <span className="path-link">See scrims</span>
+              </Link>
+              <Link className="path path-red" href="/trials">
+                <span className="path-icon">
+                  <Icon name="join" size={26} />
+                </span>
+                <h3>Team trials</h3>
+                <p>Want to play for KRAVYADA? Send your Free Fire ID, role and device to try out for the roster.</p>
+                <span className="path-link">Apply for trials</span>
+              </Link>
             </div>
           </Reveal>
         </div>
@@ -179,16 +170,39 @@ export default function Home() {
         </section>
       )}
 
-      <section className="section" aria-labelledby="apply-title">
+      <section className="section" aria-labelledby="follow-title">
+        <div className="wrap">
+          <Reveal>
+            <div className="section-head">
+              <h2 id="follow-title">Stay connected</h2>
+            </div>
+            <div className="tiles">
+              {TILES.map((tile) => (
+                <a key={tile.title} className="tile" href={tile.href} {...EXTERNAL}>
+                  <span className="tile-icon">
+                    <Icon name={tile.icon} size={22} />
+                  </span>
+                  <span className="tile-text">
+                    <strong>{tile.title}</strong>
+                    <small>{tile.note}</small>
+                  </span>
+                </a>
+              ))}
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      <section className="section" aria-labelledby="indie-title">
         <div className="wrap">
           <Reveal>
             <div className="band">
-              <h2 id="apply-title">Want to play for KRAVYADA?</h2>
-              <p className="lead">Send your Free Fire ID, role and device. The application goes to our Instagram DMs.</p>
+              <h2 id="indie-title">Independent by design</h2>
+              <p className="lead">
+                KRAVYADA is a solo organisation and is not part of any other esports organisation. Read how it started and
+                what it runs.
+              </p>
               <div className="hero-actions">
-                <Link className="btn btn-red" href="/join">
-                  Apply to play
-                </Link>
                 <Link className="btn" href="/about">
                   About KRAVYADA
                 </Link>

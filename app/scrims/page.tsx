@@ -7,10 +7,10 @@ const DESCRIPTION =
   'Free Fire scrims and tournaments run by KRAVYADA ESPORTS. See what is coming up and where timings are announced.'
 
 export const metadata: Metadata = {
-  title: 'Free Fire scrims and tournaments',
+  title: 'Join Free Fire scrims and tournaments',
   description: DESCRIPTION,
   alternates: { canonical: '/scrims' },
-  openGraph: { url: '/scrims', title: 'Free Fire scrims and tournaments | KRAVYADA ESPORTS', description: DESCRIPTION },
+  openGraph: { url: '/scrims', title: 'Join Free Fire scrims and tournaments | KRAVYADA ESPORTS', description: DESCRIPTION },
 }
 
 const channels = [
@@ -44,10 +44,10 @@ export default function ScrimsPage() {
   return (
     <div className="wrap">
       <header className="page-head">
-        <h1 className="page-title">Scrims and tournaments</h1>
+        <h1 className="page-title">Join scrims</h1>
         <p className="lead">
-          Free Fire practice and competition run by KRAVYADA ESPORTS. Upcoming events are listed here as they are
-          confirmed.
+          Scrims are practice matches against other squads, and you do not need to be on the KRAVYADA team to play
+          them. Upcoming scrims and tournaments are listed here as they are confirmed.
         </p>
       </header>
 
@@ -92,11 +92,11 @@ export default function ScrimsPage() {
 
       <section className="section" aria-labelledby="play-title">
         <div className="band">
-          <h2 id="play-title">Looking for a team?</h2>
-          <p className="lead">Apply to play and tell us your Free Fire ID, role and device.</p>
+          <h2 id="play-title">Want to join the KRAVYADA team instead?</h2>
+          <p className="lead">Team trials are separate from scrims. Tell us your Free Fire ID, role and device.</p>
           <div className="hero-actions">
-            <Link className="btn btn-red" href="/join">
-              Apply to play
+            <Link className="btn btn-red" href="/trials">
+              Team trials
             </Link>
           </div>
         </div>

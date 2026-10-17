@@ -15,7 +15,7 @@ const archivo = Archivo({
   variable: '--font-archivo',
 })
 
-const DEFAULT_TITLE = 'KRAVYADA ESPORTS | Independent Free Fire esports organisation'
+const DEFAULT_TITLE = 'KRAVYADA ESPORTS | Free Fire esports organisation, scrims and team trials'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -31,6 +31,7 @@ export const metadata: Metadata = {
     google: 'CzR2A3kpKbxqIJEPCPMkjla0Uo0cm6eWWi5Lw7MKEJ0',
   },
   applicationName: 'KRAVYADA ESPORTS',
+  keywords: ['KRAVYADA ESPORTS', 'Kravyada Esports', 'kravyadaesports', 'Kravyada Free Fire', 'Free Fire scrims', 'Free Fire esports organisation India'],
   appleWebApp: { capable: true, title: 'KRAVYADA', statusBarStyle: 'black-translucent' },
   icons: { apple: '/icons/apple-touch-icon.png' },
   formatDetection: { telephone: false },
@@ -68,14 +69,21 @@ const structuredData = {
       '@type': 'Organization',
       '@id': `${SITE_URL}/#organization`,
       name: SITE_NAME,
-      alternateName: ['KRAVYADA', 'Kravyada Esports'],
+      alternateName: ['KRAVYADA', 'Kravyada Esports', 'kravyadaesports', 'Kravyada Free Fire'],
       url: `${SITE_URL}/`,
       logo: LOGO_URL,
       description:
         'KRAVYADA ESPORTS is an independent Free Fire esports organisation founded and led by Ayush Maurya.',
       founder: { '@id': `${SITE_URL}/#ayush-maurya` },
       employee: [{ '@id': `${SITE_URL}/#dinesh-maurya` }],
-      sameAs: [SOCIAL.instagram, 'https://youtube.com/@kravyadaesports', SOCIAL.discord],
+      sameAs: [
+        SOCIAL.instagram,
+        SOCIAL.paidScrims,
+        'https://youtube.com/@kravyadaesports',
+        SOCIAL.discord,
+        SOCIAL.whatsapp,
+        'https://github.com/thelifemaurya/KRAVYADA-ESPORTS',
+      ],
     },
     {
       '@type': 'Person',

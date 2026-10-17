@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async redirects() {
+    return [{ source: '/join', destination: '/trials', permanent: true }]
+  },
   async headers() {
     return [
       {

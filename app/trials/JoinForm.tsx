@@ -17,7 +17,7 @@ export default function JoinForm() {
     const get = (key: string) => String(data.get(key) ?? '').trim()
 
     const text = [
-      'KRAVYADA ESPORTS application',
+      'KRAVYADA ESPORTS team trial application',
       `In-game name: ${get('ign')}`,
       `Free Fire UID: ${get('uid')}`,
       `Role: ${get('role')}`,
