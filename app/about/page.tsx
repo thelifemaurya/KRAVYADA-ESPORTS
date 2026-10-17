@@ -66,10 +66,10 @@ const aboutJsonLd = {
 }
 
 const FOUNDING_LINEUP = [
+  { ign: 'AYUSH', name: 'Ayush Maurya', note: 'Founder & CEO' },
   { ign: 'PHOEBUS', name: 'Surya' },
   { ign: 'SKULL', name: 'Vikas' },
   { ign: 'GHOST', name: 'Dinesh' },
-  { ign: 'AYUSH', name: 'Ayush Maurya', note: 'Founder & CEO' },
 ]
 
 const PRINCIPLES = [
@@ -101,7 +101,7 @@ export default function AboutPage() {
           <div className="prose">
             <p>
               KRAVYADA did not begin as an organisation. It began as an ordinary Free Fire team that played scrims,
-              the same way thousands of squads do: Phoebus (Surya), Skull (Vikas), Ghost (Dinesh) and Ayush Maurya
+              the same way thousands of squads do: Ayush Maurya, Phoebus (Surya), Skull (Vikas) and Ghost (Dinesh)
               playing together. Nobody planned a brand. The team just kept showing up, kept playing and kept getting better.
             </p>
             <p>
