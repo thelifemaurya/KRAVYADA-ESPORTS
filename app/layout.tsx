@@ -97,7 +97,7 @@ const structuredData = {
       '@id': `${SITE_URL}/#dinesh-maurya`,
       name: 'Dinesh Maurya',
       alternateName: 'Ghost',
-      jobTitle: 'Management',
+      jobTitle: 'Player',
       worksFor: { '@id': `${SITE_URL}/#organization` },
     },
     {
