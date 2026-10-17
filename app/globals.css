@@ -830,7 +830,7 @@ a.path:active {
     bottom: 0;
     z-index: 60;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
     background: #0b0b0ee6;
     -webkit-backdrop-filter: blur(16px);
@@ -959,3 +959,18 @@ a.path:active {
   font: inherit; color: inherit; background: #101014; border: 1px solid #ffffff1f; padding: 0.4rem 0.5rem;
 }
 @media (max-width: 760px) { .admin-actions { justify-content: flex-start; } }
+
+/* Registration */
+.reg-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(1.75rem, 6vw, 2.5rem);
+  letter-spacing: 0.12em;
+  color: #fff;
+  margin: 0.5rem 0 1rem;
+  user-select: all;
+}
+.room { display: grid; gap: 1.25rem; }
+.room-ids { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 1rem; margin: 1rem 0 0; }
+.room-ids div { border: 1px solid #ffffff1f; padding: 0.9rem 1rem; }
+.room-ids dt { color: var(--steel); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; }
+.room-ids dd { margin: 0.25rem 0 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 1.4rem; color: #fff; user-select: all; word-break: break-all; }

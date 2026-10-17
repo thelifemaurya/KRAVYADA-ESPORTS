@@ -10,6 +10,7 @@ export type Scrim = {
   entry_fee: number
   status: 'upcoming' | 'live' | 'completed' | 'cancelled'
   notes: string | null
+  registration_open: boolean
 }
 
 export type Tournament = {
@@ -24,6 +25,7 @@ export type Tournament = {
   registration_url: string | null
   status: 'upcoming' | 'registration_open' | 'live' | 'completed' | 'cancelled'
   description: string | null
+  registration_open: boolean
 }
 
 async function load<T>(path: string): Promise<T[]> {
@@ -81,4 +83,28 @@ export function tournamentDetail(t: Tournament) {
   ]
     .filter(Boolean)
     .join(' · ')
+}
+
+export type OpenEvent = {
+  type: 'scrim' | 'tournament'
+  id: string
+  title: string
+  starts_at: string
+  entry_fee: number
+  slots: number | null
+}
+
+// Events people can register for right now, scrims and tournaments together, soonest first.
+export async function getOpenEvents(): Promise<OpenEvent[]> {
+  const [scrims, tournaments] = await Promise.all([
+    load<Scrim>('scrims?select=*&status=eq.upcoming&registration_open=eq.true&order=starts_at.asc'),
+    load<Tournament>(
+      'tournaments?select=*&status=in.(upcoming,registration_open)&registration_open=eq.true&order=starts_at.asc',
+    ),
+  ])
+  const all: OpenEvent[] = [
+    ...scrims.map((e) => ({ type: 'scrim' as const, id: e.id, title: e.title, starts_at: e.starts_at, entry_fee: e.entry_fee, slots: e.slots })),
+    ...tournaments.map((e) => ({ type: 'tournament' as const, id: e.id, title: e.title, starts_at: e.starts_at, entry_fee: e.entry_fee, slots: e.slots })),
+  ]
+  return all.sort((a, b) => a.starts_at.localeCompare(b.starts_at))
 }

@@ -10,6 +10,7 @@ import InstallApp from './InstallApp'
 const TABS: { href: string; label: string; icon: IconName }[] = [
   { href: '/', label: 'Home', icon: 'home' },
   { href: '/scrims', label: 'Scrims', icon: 'crosshair' },
+  { href: '/register', label: 'Register', icon: 'ticket' },
   { href: '/trials', label: 'Trials', icon: 'join' },
   { href: '/about', label: 'About', icon: 'info' },
 ]

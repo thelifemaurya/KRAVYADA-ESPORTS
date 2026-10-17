@@ -4,13 +4,14 @@ import { useCallback, useEffect, useState } from 'react'
 import { AUTH, REST, SUPABASE_KEY } from '../lib/supabase'
 
 type Session = { access_token: string; refresh_token: string; expires_at: number; email: string }
-type Row = Record<string, string | number | null> & { id: string }
+type Val = string | number | boolean | null
+type Row = Record<string, Val> & { id: string }
 type Kind = 'scrims' | 'tournaments'
 
 type Field = {
   name: string
   label: string
-  type: 'text' | 'number' | 'datetime' | 'select' | 'url' | 'textarea'
+  type: 'text' | 'number' | 'datetime' | 'select' | 'url' | 'textarea' | 'checkbox'
   required?: boolean
   options?: string[]
   help?: string
@@ -25,6 +26,7 @@ const FIELDS: Record<Kind, Field[]> = {
     { name: 'slots', label: 'Slots', type: 'number' },
     { name: 'entry_fee', label: 'Entry fee (₹)', type: 'number', help: '0 for free' },
     { name: 'status', label: 'Status', type: 'select', options: ['upcoming', 'live', 'completed', 'cancelled'] },
+    { name: 'registration_open', label: 'Registration open', type: 'checkbox', help: 'Players can register while this is on.' },
     { name: 'notes', label: 'Notes', type: 'textarea', help: 'Shown to the public. Do not put room ID or password here.' },
   ],
   tournaments: [
@@ -42,6 +44,7 @@ const FIELDS: Record<Kind, Field[]> = {
       type: 'select',
       options: ['upcoming', 'registration_open', 'live', 'completed', 'cancelled'],
     },
+    { name: 'registration_open', label: 'Registration open', type: 'checkbox', help: 'Players can register while this is on.' },
     { name: 'description', label: 'Description', type: 'textarea' },
   ],
 }
@@ -49,7 +52,7 @@ const FIELDS: Record<Kind, Field[]> = {
 const STORE_KEY = 'kravyada-admin-session'
 const IST_OFFSET_MS = 330 * 60 * 1000
 
-function toInput(iso: string | number | null) {
+function toInput(iso: Val) {
   if (!iso) return ''
   return new Date(new Date(String(iso)).getTime() + IST_OFFSET_MS).toISOString().slice(0, 16)
 }
@@ -232,6 +235,7 @@ type Api = (path: string, init?: RequestInit) => Promise<unknown>
 
 function Dashboard({ email, signOut, api }: { email: string; signOut: () => void; api: Api }) {
   const [kind, setKind] = useState<Kind>('scrims')
+  const [view, setView] = useState<'events' | 'registrations'>('events')
   const [rows, setRows] = useState<Row[]>([])
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState<Row | 'new' | null>(null)
@@ -254,7 +258,7 @@ function Dashboard({ email, signOut, api }: { email: string; signOut: () => void
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [kind])
 
-  async function save(values: Record<string, string | number | null>, id?: string) {
+  async function save(values: Record<string, Val>, id?: string) {
     setMessage('')
     try {
       if (id) await api(`${kind}?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify(values) })
@@ -268,8 +272,11 @@ function Dashboard({ email, signOut, api }: { email: string; signOut: () => void
   }
 
   async function remove(row: Row) {
-    if (!window.confirm(`Delete "${row.title}"? This cannot be undone.`)) return
+    if (!window.confirm(`Delete "${row.title}" along with its registrations and room details? This cannot be undone.`)) return
     try {
+      const type = kind === 'scrims' ? 'scrim' : 'tournament'
+      await api(`registrations?event_type=eq.${type}&event_id=eq.${row.id}`, { method: 'DELETE' })
+      await api(`room_details?event_type=eq.${type}&event_id=eq.${row.id}`, { method: 'DELETE' })
       await api(`${kind}?id=eq.${row.id}`, { method: 'DELETE' })
       await load()
       setMessage('Deleted.')
@@ -292,13 +299,24 @@ function Dashboard({ email, signOut, api }: { email: string; signOut: () => void
             <button
               key={k}
               role="tab"
-              aria-selected={kind === k}
-              className={`admin-tab${kind === k ? ' is-on' : ''}`}
-              onClick={() => setKind(k)}
+              aria-selected={view === 'events' && kind === k}
+              className={`admin-tab${view === 'events' && kind === k ? ' is-on' : ''}`}
+              onClick={() => {
+                setView('events')
+                setKind(k)
+              }}
             >
               {k === 'scrims' ? 'Scrims' : 'Tournaments'}
             </button>
           ))}
+          <button
+            role="tab"
+            aria-selected={view === 'registrations'}
+            className={`admin-tab${view === 'registrations' ? ' is-on' : ''}`}
+            onClick={() => setView('registrations')}
+          >
+            Registrations
+          </button>
         </div>
         <div className="admin-who">
           <span>{email}</span>
@@ -310,7 +328,9 @@ function Dashboard({ email, signOut, api }: { email: string; signOut: () => void
 
       {message && <p className="form-status" role="status">{message}</p>}
 
-      {editing ? (
+      {view === 'registrations' ? (
+        <RegistrationsTab api={api} />
+      ) : editing ? (
         <EditForm
           key={editing === 'new' ? 'new' : editing.id}
           fields={FIELDS[kind]}
@@ -384,7 +404,7 @@ function EditForm({
   fields: Field[]
   row: Row | null
   onCancel: () => void
-  onSave: (values: Record<string, string | number | null>, id?: string) => Promise<void>
+  onSave: (values: Record<string, Val>, id?: string) => Promise<void>
 }) {
   const [busy, setBusy] = useState(false)
 
@@ -392,10 +412,11 @@ function EditForm({
     event.preventDefault()
     setBusy(true)
     const data = new FormData(event.currentTarget)
-    const values: Record<string, string | number | null> = {}
+    const values: Record<string, Val> = {}
     for (const f of fields) {
       const raw = String(data.get(f.name) ?? '').trim()
-      if (f.type === 'datetime') values[f.name] = fromInput(raw)
+      if (f.type === 'checkbox') values[f.name] = data.has(f.name)
+      else if (f.type === 'datetime') values[f.name] = fromInput(raw)
       else if (f.type === 'number') values[f.name] = raw === '' ? (f.name === 'entry_fee' ? 0 : null) : Number(raw)
       else values[f.name] = raw === '' && !f.required && f.type !== 'select' ? null : raw
     }
@@ -411,7 +432,14 @@ function EditForm({
         return (
           <div className="field" key={f.name}>
             <label htmlFor={common.id}>{f.label}</label>
-            {f.type === 'select' ? (
+            {f.type === 'checkbox' ? (
+              <input
+                id={common.id}
+                name={f.name}
+                type="checkbox"
+                defaultChecked={row ? Boolean(row[f.name]) : true}
+              />
+            ) : f.type === 'select' ? (
               <select {...common} defaultValue={String(initial ?? '')}>
                 {f.options?.map((o) => (
                   <option key={o} value={o}>
@@ -444,5 +472,196 @@ function EditForm({
         </button>
       </div>
     </form>
+  )
+}
+
+type EventOption = { key: string; type: 'scrim' | 'tournament'; id: string; title: string; starts_at: string }
+type Registration = {
+  id: string
+  team_name: string
+  leader_ign: string
+  leader_uid: string
+  contact: string
+  status: 'pending' | 'approved' | 'rejected'
+  access_code: string
+  created_at: string
+}
+
+function RegistrationsTab({ api }: { api: Api }) {
+  const [events, setEvents] = useState<EventOption[]>([])
+  const [selected, setSelected] = useState('')
+  const [regs, setRegs] = useState<Registration[]>([])
+  const [roomId, setRoomId] = useState('')
+  const [roomPass, setRoomPass] = useState('')
+  const [published, setPublished] = useState(false)
+  const [note, setNote] = useState('')
+
+  useEffect(() => {
+    ;(async () => {
+      const [s, t] = (await Promise.all([
+        api('scrims?select=id,title,starts_at&order=starts_at.desc'),
+        api('tournaments?select=id,title,starts_at&order=starts_at.desc'),
+      ])) as [Row[], Row[]]
+      const list: EventOption[] = [
+        ...s.map((r) => ({ key: `scrim:${r.id}`, type: 'scrim' as const, id: r.id, title: String(r.title), starts_at: String(r.starts_at) })),
+        ...t.map((r) => ({ key: `tournament:${r.id}`, type: 'tournament' as const, id: r.id, title: String(r.title), starts_at: String(r.starts_at) })),
+      ].sort((a, b) => b.starts_at.localeCompare(a.starts_at))
+      setEvents(list)
+      if (list[0]) setSelected(list[0].key)
+    })().catch((e) => setNote(e instanceof Error ? e.message : 'Could not load events'))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const current = events.find((e) => e.key === selected)
+
+  const loadEvent = useCallback(async () => {
+    if (!current) return
+    setNote('')
+    try {
+      const filter = `event_type=eq.${current.type}&event_id=eq.${current.id}`
+      setRegs((await api(`registrations?select=*&${filter}&order=created_at.asc`)) as Registration[])
+      const room = (await api(`room_details?select=*&${filter}`)) as Row[]
+      setRoomId(String(room[0]?.room_id ?? ''))
+      setRoomPass(String(room[0]?.room_password ?? ''))
+      setPublished(Boolean(room[0]?.published))
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : 'Could not load')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected, events])
+
+  useEffect(() => {
+    loadEvent()
+  }, [loadEvent])
+
+  async function setStatus(reg: Registration, status: Registration['status']) {
+    try {
+      await api(`registrations?id=eq.${reg.id}`, { method: 'PATCH', body: JSON.stringify({ status }) })
+      await loadEvent()
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : 'Could not update')
+    }
+  }
+
+  async function removeReg(reg: Registration) {
+    if (!window.confirm(`Delete the registration of "${reg.team_name}"?`)) return
+    try {
+      await api(`registrations?id=eq.${reg.id}`, { method: 'DELETE' })
+      await loadEvent()
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : 'Could not delete')
+    }
+  }
+
+  async function saveRoom(nextPublished: boolean) {
+    if (!current) return
+    try {
+      await api('room_details', {
+        method: 'POST',
+        headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
+        body: JSON.stringify({
+          event_type: current.type,
+          event_id: current.id,
+          room_id: roomId.trim() || null,
+          room_password: roomPass.trim() || null,
+          published: nextPublished,
+          updated_at: new Date().toISOString(),
+        }),
+      })
+      setPublished(nextPublished)
+      setNote(nextPublished ? 'Room details published to approved squads.' : 'Room details saved and hidden.')
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : 'Could not save room details')
+    }
+  }
+
+  if (events.length === 0) {
+    return (
+      <div className="empty">
+        <strong>No events yet.</strong>
+        Add a scrim or tournament first, then its registrations show up here.
+      </div>
+    )
+  }
+
+  const approved = regs.filter((r) => r.status === 'approved').length
+
+  return (
+    <div className="admin">
+      {note && <p className="form-status" role="status">{note}</p>}
+      <div className="field">
+        <label htmlFor="reg-event">Event</label>
+        <select id="reg-event" value={selected} onChange={(e) => setSelected(e.target.value)}>
+          {events.map((e) => (
+            <option key={e.key} value={e.key}>
+              {e.type === 'scrim' ? 'Scrim' : 'Tournament'}: {e.title}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="form">
+        <h3>Room ID and password</h3>
+        <p className="note">
+          Approved squads see these in the "Get your ID and password" section once you publish. Hidden until then.
+        </p>
+        <div className="field-row">
+          <div className="field">
+            <label htmlFor="room-id">Room ID</label>
+            <input id="room-id" value={roomId} onChange={(e) => setRoomId(e.target.value)} maxLength={40} autoComplete="off" />
+          </div>
+          <div className="field">
+            <label htmlFor="room-pass">Password</label>
+            <input id="room-pass" value={roomPass} onChange={(e) => setRoomPass(e.target.value)} maxLength={40} autoComplete="off" />
+          </div>
+        </div>
+        <div className="hero-actions">
+          <button className="btn btn-red" onClick={() => saveRoom(true)}>
+            {published ? 'Update and keep published' : 'Save and publish'}
+          </button>
+          {published && (
+            <button className="btn" onClick={() => saveRoom(false)}>
+              Hide from players
+            </button>
+          )}
+        </div>
+        <p className="note">Status: {published ? 'Published' : 'Hidden'}</p>
+      </div>
+
+      <h3>
+        Registrations ({regs.length}) · approved {approved}
+      </h3>
+      {regs.length === 0 ? (
+        <div className="empty">
+          <strong>No registrations yet.</strong>
+        </div>
+      ) : (
+        <ul className="rows admin-list">
+          {regs.map((r) => (
+            <li className="row" key={r.id}>
+              <h3>{r.team_name}</h3>
+              <p>
+                {r.leader_ign} · UID {r.leader_uid} · {r.contact} · {r.status}
+              </p>
+              <div className="admin-actions">
+                {r.status !== 'approved' && (
+                  <button className="btn btn-sm btn-red" onClick={() => setStatus(r, 'approved')}>
+                    Approve
+                  </button>
+                )}
+                {r.status !== 'rejected' && (
+                  <button className="btn btn-sm" onClick={() => setStatus(r, 'rejected')}>
+                    Reject
+                  </button>
+                )}
+                <button className="btn btn-sm btn-ghost" onClick={() => removeReg(r)}>
+                  Delete
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   )
 }
