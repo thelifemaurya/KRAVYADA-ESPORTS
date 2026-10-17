@@ -4,7 +4,7 @@ import { SITE_URL } from './site'
 // Served at /robots.txt and points crawlers to the sitemap.
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: [{ userAgent: '*', allow: '/' }],
+    rules: [{ userAgent: '*', allow: '/', disallow: ['/admin'] }],
     sitemap: `${SITE_URL}/sitemap.xml`,
     host: SITE_URL,
   }

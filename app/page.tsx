@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { EXTERNAL, SOCIAL } from './site'
 import { roster } from './data/roster'
 import { results } from './data/results'
-import { schedule } from './data/schedule'
+import { formatWhen, getUpcomingScrims, scrimDetail } from './lib/events'
 import Icon, { type IconName } from './components/Icon'
 import InstallApp from './components/InstallApp'
 import Reveal from './components/Reveal'
@@ -17,8 +17,10 @@ const TILES: Tile[] = [
   { title: 'WhatsApp', note: 'Channel updates', icon: 'bell', href: SOCIAL.whatsapp },
 ]
 
-export default function Home() {
-  const nextUp = schedule.slice(0, 3)
+export const revalidate = 60
+
+export default async function Home() {
+  const nextUp = (await getUpcomingScrims()).slice(0, 3)
 
   return (
     <>
@@ -103,10 +105,10 @@ export default function Home() {
             {nextUp.length > 0 ? (
               <ul className="rows">
                 {nextUp.map((item) => (
-                  <li className="row" key={`${item.when}-${item.title}`}>
+                  <li className="row" key={item.id}>
                     <h3>{item.title}</h3>
-                    <p>{item.detail}</p>
-                    <span className="row-when">{item.when}</span>
+                    <p>{scrimDetail(item)}</p>
+                    <span className="row-when">{formatWhen(item.starts_at)}</span>
                   </li>
                 ))}
               </ul>

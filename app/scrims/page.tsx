@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { EXTERNAL, SOCIAL } from '../site'
-import { schedule } from '../data/schedule'
+import { formatWhen, getUpcomingScrims, getUpcomingTournaments, scrimDetail, tournamentDetail } from '../lib/events'
+
+export const revalidate = 60
 
 const DESCRIPTION =
   'Free Fire scrims and tournaments run by KRAVYADA ESPORTS. See what is coming up and where timings are announced.'
@@ -40,7 +42,9 @@ const channels = [
   },
 ]
 
-export default function ScrimsPage() {
+export default async function ScrimsPage() {
+  const [scrims, tournaments] = await Promise.all([getUpcomingScrims(), getUpcomingTournaments()])
+
   return (
     <div className="wrap">
       <header className="page-head">
@@ -53,25 +57,52 @@ export default function ScrimsPage() {
 
       <section className="section" aria-labelledby="upcoming-title">
         <div className="section-head">
-          <h2 id="upcoming-title">Upcoming</h2>
+          <h2 id="upcoming-title">Upcoming scrims</h2>
         </div>
-        {schedule.length > 0 ? (
+        {scrims.length > 0 ? (
           <ul className="rows">
-            {schedule.map((item) => (
-              <li className="row" key={`${item.when}-${item.title}`}>
+            {scrims.map((item) => (
+              <li className="row" key={item.id}>
                 <h3>{item.title}</h3>
-                <p>{item.detail}</p>
-                <span className="row-when">{item.when}</span>
+                <p>{scrimDetail(item)}</p>
+                <span className="row-when">{formatWhen(item.starts_at)}</span>
               </li>
             ))}
           </ul>
         ) : (
           <div className="empty">
-            <strong>Nothing is scheduled on this page yet.</strong>
+            <strong>No scrims are scheduled right now.</strong>
             Timings and lobby details are posted on the channels below first.
           </div>
         )}
       </section>
+
+      {tournaments.length > 0 && (
+        <section className="section" aria-labelledby="tournaments-title">
+          <div className="section-head">
+            <h2 id="tournaments-title">Tournaments</h2>
+          </div>
+          <ul className="rows">
+            {tournaments.map((item) => (
+              <li className="row" key={item.id}>
+                <h3>{item.title}</h3>
+                <p>
+                  {tournamentDetail(item)}
+                  {item.registration_url && item.status === 'registration_open' && (
+                    <>
+                      {' '}
+                      <a className="link" href={item.registration_url} {...EXTERNAL}>
+                        Register
+                      </a>
+                    </>
+                  )}
+                </p>
+                <span className="row-when">{formatWhen(item.starts_at)}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section className="section" aria-labelledby="where-title">
         <div className="section-head">

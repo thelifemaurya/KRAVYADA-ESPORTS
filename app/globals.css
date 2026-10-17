@@ -942,3 +942,20 @@ a.path:active {
     transition: none;
   }
 }
+
+/* Admin panel */
+.admin { display: grid; gap: 1.25rem; }
+.admin-login { max-width: 26rem; }
+.admin-bar { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; justify-content: space-between; }
+.admin-tabs { display: flex; gap: 0.5rem; }
+.admin-tab {
+  font: inherit; color: var(--steel); background: transparent; border: 1px solid #ffffff1f;
+  padding: 0.55rem 1rem; cursor: pointer;
+}
+.admin-tab.is-on { color: #fff; background: var(--red); border-color: var(--red); }
+.admin-who { display: flex; gap: 0.75rem; align-items: center; color: var(--steel); font-size: 0.875rem; }
+.admin-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; justify-content: flex-end; }
+.admin-actions select {
+  font: inherit; color: inherit; background: #101014; border: 1px solid #ffffff1f; padding: 0.4rem 0.5rem;
+}
+@media (max-width: 760px) { .admin-actions { justify-content: flex-start; } }
